@@ -83,17 +83,39 @@ body{
 .sky-golden{ background:linear-gradient(180deg,#e58a4e 0%, #f4b46c 46%, #f7d7a2 100%);
             opacity:0; transition:opacity 1.6s var(--ease); }
 
-/* sun / moon sit top-right (tappable — see easter eggs) */
-.celestial{ position:absolute; top:48px; right:30px; width:74px; height:74px; pointer-events:auto; cursor:pointer; }
+/* sun / moon sit top-right */
+.celestial{ position:absolute; top:48px; right:30px; width:74px; height:74px; }
+/* invisible tap target over the sun/moon, above the content layer */
+.taps{ position:fixed; top:0; left:50%; transform:translateX(-50%);
+  width:min(100vw,var(--app-w)); height:100dvh; z-index:7; pointer-events:none; }
+.celestial-tap{ position:absolute; top:44px; right:26px; width:82px; height:82px;
+  pointer-events:auto; cursor:pointer; background:none; border:0; padding:0; -webkit-tap-highlight-color:transparent; }
 .celestial svg{ width:100%; height:100%; display:block; image-rendering:pixelated; shape-rendering:crispEdges; }
 .sun{   position:absolute; inset:0; transition:opacity 1.6s var(--ease), transform 1.6s var(--ease); }
 .moon{  position:absolute; inset:0; opacity:0; transition:opacity 1.6s var(--ease), transform 1.6s var(--ease); }
 /* tap flourishes (sun rays / moon twinkles) */
-.spark{ position:absolute; left:50%; top:50%; width:3px; height:3px; border-radius:1px;
-  background:#ffd24a; pointer-events:none; transform:translate(-50%,-50%);
-  animation:spark .7s var(--ease) forwards; }
-@keyframes spark{ from{ transform:translate(-50%,-50%); opacity:1; }
-  to{ transform:translate(calc(-50% + var(--rx)), calc(-50% + var(--ry))); opacity:0; } }
+/* bright warm halo glowing ~200px around the sun, holds ~10s, then gently fades */
+.sun-pulse{ position:absolute; left:50%; top:50%; width:420px; height:420px; border-radius:50%;
+  pointer-events:none; transform:translate(-50%,-50%) scale(.7);
+  background:radial-gradient(circle, rgba(255,214,98,.78) 0%, rgba(255,190,98,.36) 36%, rgba(255,200,80,.12) 60%, rgba(255,206,74,0) 80%);
+  animation:sunpulse 10s linear forwards; }
+@keyframes sunpulse{ 0%{ transform:translate(-50%,-50%) scale(.7); opacity:0; }
+  7%{ transform:translate(-50%,-50%) scale(1); opacity:.95; }
+  72%{ transform:translate(-50%,-50%) scale(1.03); opacity:.9; }
+  100%{ transform:translate(-50%,-50%) scale(1.1); opacity:0; } }
+/* a little flock crossing the sky on a sun tap */
+.bird{ position:fixed; left:0; z-index:4; pointer-events:none; will-change:transform; }
+.bird svg{ display:block; overflow:visible; }
+.bird .wing{ transform-box:fill-box; transform-origin:42% 100%;
+  animation:wingflap .26s ease-in-out infinite alternate; }
+@keyframes wingflap{ from{ transform:rotate(-36deg); } to{ transform:rotate(38deg); } }
+@keyframes birdfly{
+  0%  { transform:translate(-14vw,0); }
+  25% { transform:translate(18vw,-6px); }
+  50% { transform:translate(50vw,3px); }
+  75% { transform:translate(82vw,-5px); }
+  100%{ transform:translate(116vw,0); }
+}
 .twinkle-star{ position:absolute; width:4px; height:4px; border-radius:50%;
   background:#fdfdff; box-shadow:0 0 7px 1px #dfeaff; pointer-events:none;
   transform:translate(-50%,-50%) scale(0); animation:twk 1.9s var(--ease) forwards; }
@@ -112,19 +134,22 @@ body{
   width:min(100vw,var(--app-w)); height:62%;
   pointer-events:none; z-index:1; opacity:0;
   mix-blend-mode:screen; filter:blur(11px) saturate(1.25);
-  background:
-    radial-gradient(48% 88% at 22% -8%,  rgba(86,232,176,.55), transparent 72%),
-    radial-gradient(44% 82% at 46% -10%, rgba(120,180,255,.48), transparent 72%),
-    radial-gradient(42% 92% at 70% -6%,  rgba(168,118,236,.46), transparent 74%),
-    radial-gradient(40% 80% at 86% -10%, rgba(96,228,206,.44), transparent 72%);
-  animation:auroraShow 4.4s var(--ease) forwards, auroraWave 4.4s ease-in-out;
+  background-repeat:repeat-x; background-size:200% 100%;
+  background-image:
+    radial-gradient(30% 88% at 12% -8%,  rgba(86,232,176,.55), transparent 70%),
+    radial-gradient(26% 82% at 30% -10%, rgba(120,180,255,.48), transparent 70%),
+    radial-gradient(28% 92% at 50% -6%,  rgba(168,118,236,.46), transparent 72%),
+    radial-gradient(24% 80% at 70% -10%, rgba(96,228,206,.44), transparent 70%),
+    radial-gradient(28% 86% at 88% -8%,  rgba(120,210,255,.46), transparent 72%);
+  animation:auroraShow 5.2s var(--ease) forwards, auroraWave 5.2s ease-in-out, auroraSweep 5.2s linear;
 }
-@keyframes auroraShow{ 0%{opacity:0;} 16%{opacity:.9;} 72%{opacity:.7;} 100%{opacity:0;} }
+@keyframes auroraShow{ 0%{opacity:0;} 16%{opacity:.9;} 78%{opacity:.7;} 100%{opacity:0;} }
+@keyframes auroraSweep{ from{ background-position-x:0; } to{ background-position-x:-200%; } }   /* curtains travel across */
 @keyframes auroraWave{
   0%  { transform:translateX(-50%) skewX(0deg)  scaleY(1);    }
-  30% { transform:translateX(-46%) skewX(-6deg) scaleY(1.08); }
-  62% { transform:translateX(-54%) skewX(5deg)  scaleY(.97);  }
-  100%{ transform:translateX(-50%) skewX(0deg)  scaleY(1.02); }
+  28% { transform:translateX(-50%) skewX(-7deg) scaleY(1.09); }
+  60% { transform:translateX(-50%) skewX(6deg)  scaleY(.96);  }
+  100%{ transform:translateX(-50%) skewX(0deg)  scaleY(1.03); }
 }
 /* sunflower is long-pressable for golden hour */
 .flower.tappable{ pointer-events:auto; cursor:pointer; touch-action:none;
@@ -185,7 +210,7 @@ body{
 .critter{
   position:fixed; top:0; left:50%; transform:translateX(-50%);
   width:min(100vw,var(--app-w)); height:100dvh;
-  z-index:4; pointer-events:none;
+  z-index:6; pointer-events:none;          /* in front of the flowers (z5) */
 }
 .bug{ position:absolute; top:0; left:0; will-change:transform; }
 .bug-art{ position:relative; display:flex; align-items:center; }
@@ -196,6 +221,8 @@ body{
 .wing-l{ transform-origin:100% 45%; }                 /* hinge at the body */
 .wing-r{ transform-origin:0% 45%; }
 @keyframes flap{ from{ transform:scaleX(1); } to{ transform:scaleX(var(--flap-min,.3)); } }
+/* wings settle when the critter lands on a button */
+.bug.resting .wing, .bug.resting .bfly{ animation-play-state:paused; }
 /* monarch: single sprite, gentle 2-frame flap (snaps between two states) */
 .bfly{ transform-origin:50% 50%; animation:bflap .5s infinite; }
 .bfly svg{ display:block; image-rendering:pixelated; shape-rendering:crispEdges; }
@@ -340,18 +367,23 @@ main{ position:relative; z-index:2; }
 
 /* ---- NOW PLAYING (vinyl + text, no box) ---- */
 .song{ display:flex; align-items:center; gap:18px; }
-.vinyl{
-  flex:0 0 auto; position:relative; width:80px; height:80px; border-radius:50%;
+.vinyl{   /* link wrapper + wobble target (does not spin) */
+  flex:0 0 auto; position:relative; width:80px; height:80px;
   border:0; padding:0; cursor:pointer; pointer-events:auto; appearance:none; text-decoration:none;
+  display:block;
+}
+.vinyl.wobble{ animation:vinylwobble .5s var(--ease); }
+@keyframes vinylwobble{ 0%{transform:rotate(0);} 22%{transform:rotate(-9deg);}
+  48%{transform:rotate(6deg);} 72%{transform:rotate(-4deg);} 100%{transform:rotate(0);} }
+.disc{   /* the spinning record */
+  position:absolute; inset:0; border-radius:50%;
   background:repeating-radial-gradient(circle at 50% 50%, #1b1816 0 1.4px, #2a2622 1.4px 2.8px);
   box-shadow:0 5px 13px rgba(26,23,20,.3), inset 0 0 0 1px rgba(245,240,230,.05);
   animation:spin 6s linear infinite; display:grid; place-items:center;
 }
-.vinyl:active{ transform:scale(.97); }
-.vinyl.paused{ animation-play-state:paused; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 /* soft sheen that rides the disc as it turns */
-.vinyl::before{
+.disc::before{
   content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none;
   background:linear-gradient(125deg, rgba(245,240,230,.22) 0%, rgba(245,240,230,0) 36%,
             rgba(245,240,230,0) 64%, rgba(245,240,230,.09) 100%);
@@ -389,15 +421,15 @@ main{ position:relative; z-index:2; }
 .portfolio{
   pointer-events:auto; margin-top:16px; display:inline-block;
   font-family:'Figtree',sans-serif; font-weight:500; font-size:16px;
-  color:var(--ink); text-decoration:none;
-  border-bottom:1.5px solid currentColor; padding-bottom:2px;
+  color:var(--accent); text-decoration:none;
+  transition:color 1.6s var(--ease);
 }
 .portfolio:active{ opacity:.5; }
 .say-hi{ margin-top:16px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
 .email-link{
   pointer-events:auto; display:inline-block;
-  font-family:'Figtree',sans-serif; font-weight:500; font-size:16px;
-  color:var(--ink); text-decoration:none;
+  font-family:'Figtree',sans-serif; font-weight:500; font-size:14px;
+  color:var(--ink); opacity:.58; text-decoration:none;   /* match the muted 'say hi:' colour */
   border-bottom:1.5px solid currentColor; padding-bottom:2px;
 }
 .email-link:active{ opacity:.5; }
@@ -444,12 +476,13 @@ body{ transition:color 1.6s var(--ease); }
     <div class="sky sky-golden" id="skyGolden"></div>
 
     <div class="stars" id="stars"></div>
-    <div class="clouds" id="clouds"></div>
 
     <div class="celestial" id="celestial">
       <div class="sun"  id="sun"></div>     <!-- pixel disc, drawn in JS -->
       <div class="moon" id="moon"></div>    <!-- pixel disc + craters, drawn in JS -->
     </div>
+
+    <div class="clouds" id="clouds"></div>  <!-- after celestial → clouds drift in front of the sun -->
 
   </div>
 
@@ -459,6 +492,11 @@ body{ transition:color 1.6s var(--ease); }
   <!-- ===== CRITTER (butterfly by day / firefly by night) ===== -->
   <div class="critter" id="critter" aria-hidden="true">
     <div class="bug" id="bug"><div class="glow"></div><div class="bug-art" id="bugArt"></div></div>
+  </div>
+
+  <!-- ===== sun/moon tap target (sits above content so it's reachable) ===== -->
+  <div class="taps" aria-hidden="true">
+    <button class="celestial-tap" id="celestialTap" type="button" aria-label="sky"></button>
   </div>
 
   <!-- ===== PINNED TOP SLOT ===== -->
@@ -491,9 +529,9 @@ body{ transition:color 1.6s var(--ease); }
 
     <!-- NOW PLAYING -->
     <section class="block reveal" id="nowplaying">
-      <div class="eyebrow">Currently playing</div>
+      <div class="eyebrow">Listening to</div>
       <div class="song">
-        <a class="vinyl" id="vinyl" href="https://open.spotify.com/track/5ruzrDWcT0vuJIOMW7gMnW" target="_blank" rel="noopener" aria-label="Listen on Spotify"><div class="album" id="album"></div></a>
+        <a class="vinyl" id="vinyl" href="https://open.spotify.com/track/5ruzrDWcT0vuJIOMW7gMnW" target="_blank" rel="noopener" aria-label="Listen on Spotify"><span class="disc"><span class="album" id="album"></span></span></a>
         <div class="song-meta">
           <div class="np"><span class="eq"><i></i><i></i><i></i></span> Now playing</div>
           <!-- EDIT SONG HERE -->
@@ -505,7 +543,7 @@ body{ transition:color 1.6s var(--ease); }
 
     <!-- PROJECTS -->
     <section class="block reveal">
-      <div class="eyebrow">Currently building</div>
+      <div class="eyebrow">Currently building at</div>
       <div class="project">
         <div class="h">Sun World International</div>
         <div class="role">User Experience Designer</div>
@@ -567,17 +605,44 @@ const CONFIG_WINDOWS = [
 ];
 const VARIANTS = {
   config:  ["Currently @ config", "Still @ config", "Come say hi @ config"],
-  working: ["Probably working", "Heads down rn", "Probably at my desk"],
-  grass:   ["Out touching grass"],
+  work: [
+    "Deep in something tangled, making it make sense",
+    "Turning chaos into something calmer",
+    "Making the complicated feel simple. Slowly",
+    "Heads down, edges getting smoother",
+    "Moving the world one pixel at a time",
+    "In the thick of it, the good kind",
+    "Wrangling complexity, mug within reach",
+    "At my desk, untangling",
+  ],
+  evening: [
+    "Trading pixels for fresh air",
+    "Chasing a sunset or a decent dinner",
+    "Somewhere greener than this screen",
+    "Off being a person for a bit",
+    "Wandering, where the good ideas hide",
+    "Recharging, ideally near trees",
+    "Powered entirely by dinner",
+    "Out finding the next favourite spot",
+  ],
+  night: [
+    "Currently: horizontal",
+    "Asleep, dreaming in tidy margins",
+    "Low power mode. Full brightness tomorrow",
+    "Out cold. Back at a civilised hour",
+    "Resting the eyes that judge your kerning",
+    "Lights out. Rebooting at sunrise",
+    "Somewhere between today and tomorrow",
+  ],
 };
 function statusState(now){
   for(const [s,e] of CONFIG_WINDOWS){ if(now>=s && now<e) return 'config'; }
-  const day=now.getDay(), h=now.getHours();      // 0=Sun..6=Sat
-  const weekday = day>=1 && day<=5;
-  if(weekday && h>=9 && h<17) return 'working';   // Mon–Fri 9am–5pm
-  return 'grass';
+  const h=now.getHours();
+  if(h>=9 && h<17)  return 'work';      // 9am–5pm
+  if(h>=17 && h<22) return 'evening';   // 5pm–10pm
+  return 'night';                        // 10pm–9am
 }
-function variantIndex(now){ return Math.floor(now.getTime()/12000) % 3; } // rotate ~12s
+function variantIndex(now){ return Math.floor(now.getTime()/12000); } // rotate ~12s (mod by list length in tick)
 
 /* ---------------------------------------------------------------------
    DAY / NIGHT  (smooth, eased at boundaries; day 6am–7pm)
@@ -642,14 +707,18 @@ function applySky(n){
   isNight = n>0.5;
   document.body.classList.toggle('is-night', isNight);
   metaTheme.content = lerpHex('#aed1e6','#0b1733', n);   // Safari bars blend with the sky
-  // flowers stay solid & saturated by day, cool & softly glowing at night
-  const bright = lerp(1.0,0.7,n);
-  const sat    = lerp(1.18,0.82,n);
-  const hue    = lerp(0,-16,n);
-  const glow   = n*7;
+  // flowers lit to match the time of day: neutral midday, golden at dawn/dusk, cool & dim at night
+  const warm = 4*n*(1-n);                       // golden-hour warmth — peaks at the sunrise/sunset transitions
+  const bright = lerp(1.0,0.72,n) - warm*0.04;
+  const sat    = lerp(1.18,0.85,n) + warm*0.12;
+  const sep    = warm*0.22;
+  const hue    = lerp(0,-15,n) + warm*6;
+  const coolGlow = n*7, warmGlow = warm*5;
   flowersEl.style.filter =
-    `brightness(${bright}) saturate(${sat}) hue-rotate(${hue}deg)`
-    + ` drop-shadow(0 1px 0 rgba(40,30,20,.22)) drop-shadow(0 0 ${glow}px rgba(150,180,255,${0.45*n}))`;
+    `brightness(${bright}) saturate(${sat}) sepia(${sep}) hue-rotate(${hue}deg)`
+    + ` drop-shadow(0 1px 0 rgba(40,30,20,.22))`
+    + ` drop-shadow(0 0 ${warmGlow}px rgba(255,165,85,${0.4*warm}))`
+    + ` drop-shadow(0 0 ${coolGlow}px rgba(150,180,255,${0.45*n}))`;
 }
 
 /* ---------------------------------------------------------------------
@@ -942,13 +1011,13 @@ function step(t){
   const w=critterLayer.clientWidth, h=critterLayer.clientHeight, m=14;
   const spd=(bugMode==='firefly'?0.9:1.35);
   if(mode==='resting'){
-    if(t>restUntil){ mode='wander'; nextRest=t+3000+Math.random()*4000; }
+    if(t>restUntil){ mode='wander'; nextRest=t+3000+Math.random()*4000; bug.classList.remove('resting'); }
   } else if(mode==='toRest'){
     const dx=target.x-bx, dy=target.y-by, d=Math.hypot(dx,dy);
     ang=Math.atan2(dy,dx);
     const s=Math.min(spd, d/8);
     bx+=Math.cos(ang)*s*dt*60; by+=Math.sin(ang)*s*dt*60;
-    if(d<4){ mode='resting'; restUntil=t+1600+Math.random()*3200; }
+    if(d<4){ mode='resting'; restUntil=t+1600+Math.random()*3200; bug.classList.add('resting'); }
   } else {                                   // wander: drifting turn rate = looping paths
     turn += (Math.random()-0.5)*9*dt;
     turn = Math.max(-3.2, Math.min(3.2, turn));
@@ -1080,14 +1149,39 @@ function applyGolden(){
   sf.addEventListener('pointercancel', cancel);
   sf.addEventListener('contextmenu', e=>e.preventDefault());
 })();
+/* a small flock crosses the sky on a sun tap */
+function flyBirds(){
+  // side-profile bird (facing the flight direction) with a flapping wing
+  const art='<svg viewBox="0 0 22 16" width="22" height="16">'
+    + '<g fill="#3a342c">'
+    +   '<ellipse cx="9" cy="9" rx="6" ry="2.3"/>'        // body
+    +   '<circle cx="14.6" cy="8" r="1.9"/>'              // head
+    +   '<path d="M16 7.4 L19.4 8 L16 8.8 Z"/>'           // beak
+    +   '<path d="M3.4 9 L0 7.2 L0 10.8 Z"/>'             // tail
+    + '</g>'
+    + '<path class="wing" fill="#2f2a23" d="M9 8 L13 1.5 L5.5 4 Z"/>'   // flapping wing
+    + '</svg>';
+  const flock=3+Math.floor(Math.random()*2);
+  for(let i=0;i<flock;i++){
+    const b=document.createElement('div'); b.className='bird';
+    b.style.top=(9+Math.random()*16)+'%';
+    const dur=3.6+Math.random()*1.4;
+    b.style.animation=`birdfly ${dur.toFixed(2)}s linear ${(i*0.45).toFixed(2)}s forwards`;
+    b.innerHTML=art;
+    const wing=b.querySelector('.wing');
+    if(wing) wing.style.animationDuration=(0.22+Math.random()*0.1).toFixed(2)+'s';   // slightly varied flap
+    document.body.appendChild(b);
+    setTimeout(()=>b.remove(), (dur+i*0.45+0.4)*1000);
+  }
+}
 /* (2) SUN / MOON tap — tiny repeatable flourishes, no lasting state */
 (function(){
-  const cel=$('#celestial'); if(!cel) return;
-  cel.addEventListener('click', ()=>{
+  const cel=$('#celestial'), tap=$('#celestialTap'); if(!cel||!tap) return;
+  tap.addEventListener('click', ()=>{
     if(isNight){
       if(!document.querySelector('.aurora')){                           // faint drifting northern lights
         const au=document.createElement('div'); au.className='aurora';
-        document.body.appendChild(au); setTimeout(()=>au.remove(),4600);
+        document.body.appendChild(au); setTimeout(()=>au.remove(),5400);
       }
       const p=document.createElement('div'); p.className='moon-pulse';   // soft glow ping
       cel.appendChild(p); setTimeout(()=>p.remove(),1500);
@@ -1098,13 +1192,9 @@ function applyGolden(){
         cel.appendChild(s); setTimeout(()=>s.remove(),2000);
       });
     } else {
-      for(let i=0;i<8;i++){
-        const r=document.createElement('div'); r.className='spark';
-        const a=i*Math.PI/4;
-        r.style.setProperty('--rx',(Math.cos(a)*30).toFixed(1)+'px');
-        r.style.setProperty('--ry',(Math.sin(a)*30).toFixed(1)+'px');
-        cel.appendChild(r); setTimeout(()=>r.remove(),800);
-      }
+      const p=document.createElement('div'); p.className='sun-pulse';   // warm halo, holds ~10s
+      cel.appendChild(p); setTimeout(()=>p.remove(),10200);
+      flyBirds();
     }
   });
 })();
@@ -1145,6 +1235,18 @@ if(scrollHint) scrollHint.addEventListener('click', ()=>{
   const sec=$('#nowplaying'); if(!sec) return;
   glideTo(sec.getBoundingClientRect().top + window.scrollY - 72, 1200);
 });
+
+/* vinyl opens the song only on a double-tap (single tap does nothing) */
+const vinyl=$('#vinyl');
+if(vinyl){
+  let lastTap=0;
+  vinyl.addEventListener('click', e=>{
+    e.preventDefault();
+    const t=performance.now();
+    if(t-lastTap<350){ lastTap=0; window.open(vinyl.href, '_blank', 'noopener'); }
+    else { lastTap=t; vinyl.classList.remove('wobble'); void vinyl.offsetWidth; vinyl.classList.add('wobble'); }
+  });
+}
 
 </script>
 </body>
