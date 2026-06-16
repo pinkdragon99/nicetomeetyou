@@ -80,12 +80,55 @@ body{
 .sky-day{   background:linear-gradient(180deg,var(--day-top)   0%, var(--day-bottom)   100%); }
 .sky-night{ background:linear-gradient(180deg,var(--night-top) 0%, var(--night-bottom) 100%);
             opacity:0; transition:opacity 1.6s var(--ease); }
+.sky-golden{ background:linear-gradient(180deg,#e58a4e 0%, #f4b46c 46%, #f7d7a2 100%);
+            opacity:0; transition:opacity 1.6s var(--ease); }
 
-/* sun / moon sit top-right */
-.celestial{ position:absolute; top:48px; right:30px; width:74px; height:74px; }
+/* sun / moon sit top-right (tappable — see easter eggs) */
+.celestial{ position:absolute; top:48px; right:30px; width:74px; height:74px; pointer-events:auto; cursor:pointer; }
 .celestial svg{ width:100%; height:100%; display:block; image-rendering:pixelated; shape-rendering:crispEdges; }
 .sun{   position:absolute; inset:0; transition:opacity 1.6s var(--ease), transform 1.6s var(--ease); }
 .moon{  position:absolute; inset:0; opacity:0; transition:opacity 1.6s var(--ease), transform 1.6s var(--ease); }
+/* tap flourishes (sun rays / moon twinkles) */
+.spark{ position:absolute; left:50%; top:50%; width:3px; height:3px; border-radius:1px;
+  background:#ffd24a; pointer-events:none; transform:translate(-50%,-50%);
+  animation:spark .7s var(--ease) forwards; }
+@keyframes spark{ from{ transform:translate(-50%,-50%); opacity:1; }
+  to{ transform:translate(calc(-50% + var(--rx)), calc(-50% + var(--ry))); opacity:0; } }
+.twinkle-star{ position:absolute; width:4px; height:4px; border-radius:50%;
+  background:#fdfdff; box-shadow:0 0 7px 1px #dfeaff; pointer-events:none;
+  transform:translate(-50%,-50%) scale(0); animation:twk 1.9s var(--ease) forwards; }
+@keyframes twk{ 0%{ transform:translate(-50%,-50%) scale(0); opacity:0; }
+  25%{ transform:translate(-50%,-50%) scale(1.6); opacity:1; }
+  100%{ transform:translate(-50%,-50%) scale(.7); opacity:0; } }
+.moon-pulse{ position:absolute; left:50%; top:50%; width:96px; height:96px; border-radius:50%;
+  pointer-events:none; transform:translate(-50%,-50%) scale(.45);
+  background:radial-gradient(circle, rgba(120,234,200,.55) 0%, rgba(150,200,255,.18) 45%, rgba(120,234,200,0) 70%);
+  animation:moonpulse 1.5s var(--ease) forwards; }
+@keyframes moonpulse{ from{ transform:translate(-50%,-50%) scale(.45); opacity:.9; }
+  to{ transform:translate(-50%,-50%) scale(3); opacity:0; } }
+/* northern lights — brief, faint, gently drifting (moon tap) */
+.aurora{
+  position:fixed; top:0; left:50%; transform:translateX(-50%);
+  width:min(100vw,var(--app-w)); height:62%;
+  pointer-events:none; z-index:1; opacity:0;
+  mix-blend-mode:screen; filter:blur(11px) saturate(1.25);
+  background:
+    radial-gradient(48% 88% at 22% -8%,  rgba(86,232,176,.55), transparent 72%),
+    radial-gradient(44% 82% at 46% -10%, rgba(120,180,255,.48), transparent 72%),
+    radial-gradient(42% 92% at 70% -6%,  rgba(168,118,236,.46), transparent 74%),
+    radial-gradient(40% 80% at 86% -10%, rgba(96,228,206,.44), transparent 72%);
+  animation:auroraShow 4.4s var(--ease) forwards, auroraWave 4.4s ease-in-out;
+}
+@keyframes auroraShow{ 0%{opacity:0;} 16%{opacity:.9;} 72%{opacity:.7;} 100%{opacity:0;} }
+@keyframes auroraWave{
+  0%  { transform:translateX(-50%) skewX(0deg)  scaleY(1);    }
+  30% { transform:translateX(-46%) skewX(-6deg) scaleY(1.08); }
+  62% { transform:translateX(-54%) skewX(5deg)  scaleY(.97);  }
+  100%{ transform:translateX(-50%) skewX(0deg)  scaleY(1.02); }
+}
+/* sunflower is long-pressable for golden hour */
+.flower.tappable{ pointer-events:auto; cursor:pointer; touch-action:none;
+  -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
 
 /* daytime clouds (drift left → right) */
 .clouds{ position:absolute; inset:0; opacity:0; transition:opacity 1.6s var(--ease); overflow:hidden; }
@@ -263,11 +306,14 @@ main{ position:relative; z-index:2; }
 .link:active{ opacity:.5; }
 
 .scroll-hint{
-  margin-top:44px;
+  margin-top:44px; padding:6px 12px;
+  background:none; border:0; cursor:pointer; pointer-events:auto; appearance:none;
   font-family:'DM Mono',monospace; font-size:12px; letter-spacing:.08em; text-transform:lowercase;
   color:var(--ink); opacity:.45;
   display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:opacity .25s var(--ease);
 }
+.scroll-hint:hover, .scroll-hint:active{ opacity:.8; }
 .scroll-hint .arr{ animation:bob 1.8s ease-in-out infinite; }
 @keyframes bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 
@@ -296,10 +342,13 @@ main{ position:relative; z-index:2; }
 .song{ display:flex; align-items:center; gap:18px; }
 .vinyl{
   flex:0 0 auto; position:relative; width:80px; height:80px; border-radius:50%;
+  border:0; padding:0; cursor:pointer; pointer-events:auto; appearance:none; text-decoration:none;
   background:repeating-radial-gradient(circle at 50% 50%, #1b1816 0 1.4px, #2a2622 1.4px 2.8px);
   box-shadow:0 5px 13px rgba(26,23,20,.3), inset 0 0 0 1px rgba(245,240,230,.05);
   animation:spin 6s linear infinite; display:grid; place-items:center;
 }
+.vinyl:active{ transform:scale(.97); }
+.vinyl.paused{ animation-play-state:paused; }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 /* soft sheen that rides the disc as it turns */
 .vinyl::before{
@@ -376,6 +425,10 @@ main{ position:relative; z-index:2; }
    ==================================================================== */
 body.is-night{ --ink:#f1eadd; --ink-soft:#cfc7b8; --ink-tert:#a59c8c; --line:rgba(241,234,221,.16);
   --accent:#ff7a4d;          /* a few shades brighter so coral stays vivid on navy */ }
+/* golden hour easter egg — warm low light, accent glows a touch stronger */
+body.golden{ --ink:#2a201a; --ink-soft:#5a4a3a; --ink-tert:#7a6650; --accent:#ff6a33; }
+body.golden .link{ text-shadow:0 0 10px rgba(255,106,51,.45); }
+body.golden .album{ box-shadow:0 0 0 2px var(--accent), 0 0 12px rgba(255,106,51,.5), inset 0 0 0 1px rgba(26,23,20,.3); }
 body.is-night .pin::before{ background:linear-gradient(180deg,var(--night-bottom) 38%, transparent 100%); }
 body{ transition:color 1.6s var(--ease); }
 </style>
@@ -388,11 +441,12 @@ body{ transition:color 1.6s var(--ease); }
   <div class="world" aria-hidden="true">
     <div class="sky sky-day"></div>
     <div class="sky sky-night"></div>
+    <div class="sky sky-golden" id="skyGolden"></div>
 
     <div class="stars" id="stars"></div>
     <div class="clouds" id="clouds"></div>
 
-    <div class="celestial">
+    <div class="celestial" id="celestial">
       <div class="sun"  id="sun"></div>     <!-- pixel disc, drawn in JS -->
       <div class="moon" id="moon"></div>    <!-- pixel disc + craters, drawn in JS -->
     </div>
@@ -432,14 +486,14 @@ body{ transition:color 1.6s var(--ease); }
           Instagram
         </a>
       </div>
-      <div class="scroll-hint"><span class="arr">↓</span> Scroll</div>
+      <button class="scroll-hint" id="scrollHint" type="button"><span class="arr">↓</span> Scroll</button>
     </section>
 
     <!-- NOW PLAYING -->
-    <section class="block reveal">
+    <section class="block reveal" id="nowplaying">
       <div class="eyebrow">Currently playing</div>
       <div class="song">
-        <div class="vinyl"><div class="album" id="album"></div></div>
+        <a class="vinyl" id="vinyl" href="https://open.spotify.com/track/5ruzrDWcT0vuJIOMW7gMnW" target="_blank" rel="noopener" aria-label="Listen on Spotify"><div class="album" id="album"></div></a>
         <div class="song-meta">
           <div class="np"><span class="eq"><i></i><i></i><i></i></span> Now playing</div>
           <!-- EDIT SONG HERE -->
@@ -467,7 +521,7 @@ body{ transition:color 1.6s var(--ease); }
     <!-- OTHERWISE (work + portfolio + email) -->
     <section class="block reveal">
       <div class="eyebrow">Otherwise</div>
-      <p class="work">Currently between interesting problems. Open to matcha, conversations, and the occasional job offer.</p>
+      <p class="work">In between interesting problems. Open to matcha, conversations, and the occasional job offer.</p>
       <div><a class="portfolio" href="https://adithidesigns.com/" target="_blank" rel="noopener">View my work →</a></div>
       <div class="say-hi"><span class="say-hi-label">Say hi:</span><a class="email-link" href="mailto:hello.adidee@gmail.com">hello.adidee@gmail.com</a></div>
     </section>
@@ -576,7 +630,7 @@ function discSVG(N, cells, extra=''){
   moon.innerHTML=discSVG(N,cells);
 })();
 
-let isNight=false;
+let isNight=false, goldenHour=false;
 function applySky(n){
   skyNight.style.opacity = n;
   sun.style.opacity  = 1-n;
@@ -676,104 +730,99 @@ const GREENS=[
   {S:'#67ad63',s:'#477f42',E:'#86cf7f',e:'#558f4f'},
   {S:'#54994f',s:'#3c7236',E:'#6cba66',e:'#447d3e'},
 ];
+// sample a hex ramp at t∈[0,1] (smooth interpolation between anchor colours)
+function rampAt(ramp, t){
+  const f=t*(ramp.length-1), i=Math.floor(f);
+  return i>=ramp.length-1 ? ramp[ramp.length-1] : lerpHex(ramp[i], ramp[i+1], f-i);
+}
+/* procedural circular flower: N evenly-spaced petals (distinct lobes) around a centre disc,
+   each petal shaded individually (darker base + edges, lighter tip), on a stem with leaves */
 function buildFlower(def){
   const g=GREENS[def.green];
-  const rows=centerPad(def.shape).map(r=>r.split(''));
-  // shade every petal 'P' by position from a multi-step ramp (top-centre lit = brightest)
-  let minX=1e9,maxX=-1,minY=1e9,maxY=-1;
-  rows.forEach((row,y)=>row.forEach((ch,x)=>{ if(ch==='P'){
-    if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }}));
-  const cxp=(minX+maxX)/2, hY=Math.max(1,maxY-minY), hX=Math.max(1,(maxX-minX)/2), N=def.ramp.length;
-  rows.forEach((row,y)=>row.forEach((ch,x)=>{ if(ch==='P'){
-    const yn=(y-minY)/hY, xn=Math.abs(x-cxp)/hX;
-    let i=Math.round((0.55*yn+0.45*xn)*(N-1)); i=i<0?0:i>N-1?N-1:i;
-    row[x]=String(i);                       // '0'..'N-1' → ramp colour
-  }}));
-  for(let i=0;i<def.stemH+2;i++){           // shaded stem down the centre
-    const row=Array(W).fill('.'); row[CX]='S'; row[CX+1]='s'; rows.push(row);
-  }
-  const bH=def.shape.length;                // pointed leaves angled up-and-out, shaded
-  def.leaves.forEach(lf=>{
-    const r=bH+lf.at; if(r+1>=rows.length || r-1<bH) return;
-    if(lf.side==='L'){
-      rows[r][CX-1]='E'; rows[r][CX-2]='E';
-      rows[r-1][CX-2]='E'; rows[r-1][CX-3]='E';
-      rows[r+1][CX-1]='e';
-    } else {
-      rows[r][CX+2]='E'; rows[r][CX+3]='E';
-      rows[r-1][CX+3]='E'; rows[r-1][CX+4]='E';
-      rows[r+1][CX+2]='e';
+  let Wc, c, headRows, grid;
+  if(def.spike){                                    // vertical floret spike (lavender)
+    const hmax=def.spikeR; Wc=2*hmax+1; c=hmax; headRows=def.spikeH;
+    grid=Array.from({length:headRows+def.stemH},()=>Array(Wc).fill(null));
+    for(let y=0;y<headRows;y++){
+      let half=Math.min(hmax, Math.round(y*0.62)); if(y%2) half=Math.max(0,half-1);   // bumpy florets
+      const ty=y/(headRows-1);
+      for(let dx=-half;dx<=half;dx++){ const x=c+dx, edge=Math.abs(dx)/Math.max(1,hmax);
+        grid[y][x]=rampAt(def.ramp, clamp(0.16+0.5*edge+0.2*ty)); }
     }
+  } else {                                          // radial circular flower
+    const N=def.petals, R=def.R, Rc=def.Rc, fill=def.fill!=null?def.fill:0.4, off=N*Math.PI/2;
+    Wc=2*R+1; c=R; headRows=Wc;
+    grid=Array.from({length:headRows+def.stemH},()=>Array(Wc).fill(null));
+    for(let y=0;y<headRows;y++) for(let x=0;x<Wc;x++){
+      const dx=x-c, dy=y-c, dist=Math.hypot(dx,dy);
+      if(dist>R+0.5) continue;
+      if(dist<=Rc+0.4){ grid[y][x]=rampAt(def.cramp, clamp(dist/Math.max(0.5,Rc))); continue; }
+      const ang=Math.atan2(dy,dx), lobe=0.5+0.5*Math.cos(N*ang-off);
+      const rMax=Rc+(R-Rc)*(fill+(1-fill)*lobe);
+      if(dist<=rMax+0.3){ const radial=clamp((dist-Rc)/Math.max(0.5,R-Rc));
+        grid[y][x]=rampAt(def.ramp, clamp(0.44*(1-lobe)+0.34*(1-radial)+0.07)); }
+    }
+  }
+  const H=grid.length;
+  for(let y=headRows;y<H;y++) grid[y][c]=g.S;        // 1px stem
+  (def.leaves||[]).forEach(lf=>{
+    const r=headRows+lf.at; if(r+1>=H) return;
+    if(lf.side==='L'){ grid[r][c-1]=g.E; grid[r][c-2]=g.E; grid[r-1][c-2]=g.E; if(c-3>=0)grid[r-1][c-3]=g.E; grid[r+1][c-1]=g.e; }
+    else            { grid[r][c+1]=g.E; grid[r][c+2]=g.E; grid[r-1][c+2]=g.E; if(c+3<Wc)grid[r-1][c+3]=g.E; grid[r+1][c+1]=g.e; }
   });
-  const pal={...(def.center||{}), S:g.S,s:g.s,E:g.E,e:g.e};
-  def.ramp.forEach((c,i)=>pal[String(i)]=c);
-  return pixelArt(rows.map(r=>r.join('')), pal);
+  let body='';
+  for(let y=0;y<H;y++) for(let x=0;x<Wc;x++){ const col=grid[y][x];
+    if(col) body+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${col}"/>`; }
+  return `<svg viewBox="0 0 ${Wc} ${H}" width="100%" height="100%" `
+       + `preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges">${body}</svg>`;
 }
 
-// detailed wildflowers — 'P' petals get a 5-step gradient; centres are explicit
+// circular wildflowers — N distinct petals around a centre disc (cramp), petals from ramp
+const YEL=['#ffe9a0','#f2c84a','#cf9f2e'], BRN=['#9a6e3e','#6b4a28','#33210f'],
+      DRK=['#5a4450','#2c1f28','#160e12'], DBL=['#48608f','#2c3f6b','#192448'],
+      PALEB=['#eef4ff','#cdddf7','#a9c2ee'], PALEP=['#efe6ff','#d3c2f2','#b49ae6'];
 const FLOWERS=[
-  { /* red poppy */
-    ramp:['#f6857a','#ee5a4d','#e23b2e','#c12f24','#9b2318'], center:{K:'#1c1410',y:'#e8c84a'},
-    green:0, stemH:16, leaves:[{at:7,side:'L'},{at:11,side:'R'}],
-    shape:["...PPPPP...","..PPPPPPP..",".PPPPPPPPP.",".PPPKKKPPP.","PPPKKyKKPPP",
-           "PPPKKKKKPPP",".PPPKKKPPP.",".PPPPPPPPP.","..PPPPPPP..","...PPPPP...","....PPP...."] },
-  { /* blue lupine spike */
-    ramp:['#aac2f2','#7d9ee8','#5072cf','#3a5cb8','#2c47a0'], center:{},
-    green:1, stemH:16, leaves:[{at:9,side:'R'},{at:12,side:'L'}],
-    shape:["....P....","...P.P...","..PPPPP..","..P.P.P..",".PPPPPPP.",".P.P.P.P.",
-           "PPPPPPPPP","P.P.P.P.P","PPPPPPPPP",".P.P.P.P.",".PPPPPPP.","..P.P.P.."] },
-  { /* orange sunflower — brown textured disc */
-    ramp:['#ffd884','#fbc153','#f2a52e','#dc8824','#b86e1f'], center:{D:'#955427',o:'#b87a3a',x:'#6d3f17'},
-    green:2, stemH:15, leaves:[{at:7,side:'L'},{at:11,side:'R'}],
-    shape:["..P.P.P.P..",".PPPPPPPPP.",".PPPDDDPPP.","PPPDoooDPPP","PPPDoxoDPPP",
-           "PPPDoooDPPP",".PPPDDDPPP.",".PPPPPPPPP.","..PPPPPPP..","...PPPPP...","....PPP...."] },
-  { /* lavender spike — long, natural floret stagger */
-    ramp:['#d2bef5','#b095e6','#8a64cf','#6e4cb5','#573c94'], center:{},
-    green:0, stemH:12, leaves:[{at:6,side:'R'},{at:9,side:'L'}],
-    shape:["...P...","..PPP..","..P.P..",".PPPPP.",".P.P.P.","PPPPPPP","P.P.P.P",
-           "PPPPPPP",".P.P.P.",".PPPPP.",".P.P.P.","PPPPPPP","P.P.P.P",".PPPPP.","..P.P..","..PPP..","...P..."] },
-  { /* pink cosmos — yellow centre */
-    ramp:['#fcd6e4','#f5a7c8','#ea6fa6','#d2548c','#b3406f'], center:{O:'#f2c84a',o:'#ffe187',x:'#d6a62e'},
-    green:1, stemH:16, leaves:[{at:8,side:'L'},{at:12,side:'R'}],
-    shape:["...PPPPP...",".PPPPPPPPP.","PPPPoOoPPPP","PPPPOxOPPPP","PPPPoOoPPPP",
-           ".PPPPPPPPP.","..PPPPPPP..","...PPPPP...","....PPP...."] },
+  { /* red poppy — broad petals, dark centre */
+    ramp:['#fb9a8d','#f47163','#ec4f41','#e23b2e','#cc3326','#ac291d','#8c1f15'], cramp:DRK,
+    petals:6, R:7, Rc:2, fill:.55, green:0, stemH:17, leaves:[{at:7,side:'L'},{at:11,side:'R'}] },
+  { /* periwinkle — five rounded petals */
+    ramp:['#b8cef5','#94b0ec','#6f93e2','#5072cf','#3f5cbb','#3450a8','#2a4496'], cramp:PALEB,
+    petals:5, R:6, Rc:1, fill:.5, green:1, stemH:13, leaves:[{at:8,side:'R'},{at:10,side:'L'}] },
+  { /* sunflower — many yellow petals, big brown disc */
+    ramp:['#fff3b0','#ffe785','#ffd954','#f9c534','#eab026','#d2991f','#b87f18'], cramp:BRN,
+    petals:18, R:8, Rc:4, fill:.34, green:2, stemH:15, leaves:[{at:8,side:'L'},{at:12,side:'R'}] },
+  { /* lavender-violet — rounded petals */
+    ramp:['#dccaf7','#c4abef','#a888e2','#8a64cf','#7350bb','#5f43a3','#4e388c'], cramp:PALEP,
+    petals:6, R:6, Rc:1, fill:.5, green:0, stemH:11, leaves:[{at:7,side:'R'},{at:9,side:'L'}] },
+  { /* pink cosmos — eight petals, yellow centre */
+    ramp:['#fde0eb','#f9c0d6','#f29bbb','#ea6fa6','#d6588f','#bd4576','#a23a64'], cramp:YEL,
+    petals:8, R:7, Rc:2, fill:.42, green:1, stemH:17, leaves:[{at:9,side:'L'},{at:13,side:'R'}] },
   { /* purple aster — many thin petals */
-    ramp:['#d9c9f5','#bd9fec','#8a5fd0','#7048ba','#5b3f96'], center:{O:'#f2c84a',o:'#ffe187',x:'#d6a62e'},
-    green:2, stemH:16, leaves:[{at:9,side:'R'},{at:13,side:'L'}],
-    shape:["..P.P.P.P.P..",".PPPPPPPPPPP.",".PPPPoOoPPPP.","PPPPPOxOPPPPP",".PPPPoOoPPPP.",
-           ".PPPPPPPPPPP.","..PPPPPPPPP..","...PPPPPPP...","....PPPPP....","......P......"] },
-  { /* white daisy — yellow centre */
-    ramp:['#ffffff','#f3efe6','#e3ddce','#cfc8b8','#b6af9e'], center:{O:'#f2c84a',o:'#ffe187',x:'#d6a62e'},
-    green:1, stemH:15, leaves:[{at:7,side:'L'},{at:11,side:'R'}],
-    shape:["...PPPPP...",".PPPPPPPPP.","PPPPoOoPPPP","PPPPOxOPPPP","PPPPoOoPPPP",
-           ".PPPPPPPPP.","..PPPPPPP..","...PPPPP...","....PPP...."] },
-  { /* yellow buttercup */
-    ramp:['#fff0a8','#ffe06a','#f9c63e','#e6a52a','#c4841d'], center:{x:'#b07d22',o:'#e8c84a'},
-    green:2, stemH:16, leaves:[{at:8,side:'R'},{at:12,side:'L'}],
-    shape:["...PPP...",".PPPPPPP.","PPPPxPPPP","PPPxoxPPP","PPPPxPPPP",
-           ".PPPPPPP.","..PPPPP..","...PPP...","....P...."] },
-  { /* blue cornflower — frilly head */
-    ramp:['#abc6f5','#7aa0ec','#4f7fe0','#3a63c0','#2c4a9c'], center:{O:'#3f5aa8',x:'#27356e'},
-    green:0, stemH:15, leaves:[{at:7,side:'L'},{at:11,side:'R'}],
-    shape:["..P.P.P.P..",".PPPPPPPPP.","PPPPxOxPPPP","PPPxOxOxPPP","PPPPxOxPPPP",
-           ".PPPPPPPPP.","..P.P.P.P..","...PPPPP...","....PPP...."] },
-  { /* crimson anemone — dark centre */
-    ramp:['#f06a78','#e34256','#cf2740','#b01d35','#8c1628'], center:{K:'#1c1014',o:'#4a3640'},
-    green:1, stemH:16, leaves:[{at:8,side:'R'},{at:12,side:'L'}],
-    shape:["...PPPPP...",".PPPPPPPPP.","PPPPKKKPPPP","PPPKKoKKPPP","PPPPKKKPPPP",
-           ".PPPPPPPPP.","..PPPPPPP..","...PPPPP...","....PPP...."] },
-  { /* soft pink wild rose — yellow centre */
-    ramp:['#ffd9e6','#fbb6cf','#f48fb0','#e86d96','#cf5079'], center:{O:'#f2c84a',o:'#ffe187',x:'#d6a62e'},
-    green:2, stemH:15, leaves:[{at:7,side:'L'},{at:11,side:'R'}],
-    shape:["...PPPPP...",".PPPPPPPPP.","PPPPoOoPPPP","PPPPOxOPPPP","PPPPoOoPPPP",
-           ".PPPPPPPPP.","..PPPPPPP..","...PPPPP...","....PPP...."] },
+    ramp:['#e0d3f7','#cbb4f0','#aa8be4','#8a5fd0','#7550bf','#6243a6','#523a8f'], cramp:YEL,
+    petals:16, R:7, Rc:2, fill:.3, green:2, stemH:15, leaves:[{at:9,side:'R'},{at:13,side:'L'}] },
+  { /* white daisy — many petals, yellow centre */
+    ramp:['#fbf8f1','#f4efe5','#e9e2d4','#dcd4c4','#cbc2b0','#b8af9c','#a59c88'], cramp:YEL,
+    petals:13, R:7, Rc:2, fill:.3, green:1, stemH:13, leaves:[{at:7,side:'L'},{at:11,side:'R'}] },
+  { /* yellow buttercup — five petals */
+    ramp:['#fff3b8','#ffe785','#ffd95a','#f9c63e','#e8aa2c','#cf8f22','#b67a1b'], cramp:['#fff0a8','#e8c84a','#b07d22'],
+    petals:5, R:6, Rc:1, fill:.52, green:2, stemH:12, leaves:[{at:7,side:'R'},{at:9,side:'L'}] },
+  { /* blue cornflower — frilly, many petals */
+    ramp:['#bcd2f7','#97b6ef','#6f97e6','#4f7fe0','#3e67c6','#3354aa','#294791'], cramp:DBL,
+    petals:13, R:7, Rc:2, fill:.32, green:0, stemH:16, leaves:[{at:8,side:'L'},{at:12,side:'R'}] },
+  { /* lavender — purple floret spike */
+    spike:true, ramp:['#e3d6f5','#cbb8ee','#ad93e2','#8f6fd1','#7757bb','#6244a0','#4f3787'],
+    spikeR:3, spikeH:14, green:2, stemH:11, leaves:[{at:4,side:'L'},{at:7,side:'R'}] },
+  { /* soft pink wild rose — five broad petals */
+    ramp:['#ffe2ec','#fcc6d8','#f7a3bf','#f48fb0','#e6749a','#d25c82','#b94a6e'], cramp:YEL,
+    petals:5, R:7, Rc:3, fill:.58, green:2, stemH:14, leaves:[{at:7,side:'L'},{at:11,side:'R'}] },
 ];
 
 (function buildFlowers(){
   // [widthPx, durationS, delayS, flowerIndex] — flex spaces them evenly
-  const specs=[[60,4.6,-0.3,0],[44,5.4,-1.1,1],[64,4.0,-0.6,2],[46,5.8,-2.0,3],[60,4.4,-1.4,4],
-               [64,5.0,-0.9,5],[58,4.2,-1.7,6],[42,4.8,-1.2,7],[58,5.2,-0.5,8],[60,4.5,-1.5,9],
-               [58,5.1,-0.8,10]];
+  // widths ≈ real-life relative bloom sizes: sunflower biggest … violet smallest
+  const specs=[[46,4.6,-0.3,10],[38,5.4,-1.1,1],[62,4.0,-0.6,2],[34,5.8,-2.0,3],[50,4.4,-1.4,4],
+               [44,5.0,-0.9,5],[44,4.2,-1.7,6],[38,4.8,-1.2,7],[44,5.2,-0.5,8],[26,4.5,-1.5,9],
+               [54,5.1,-0.8,0]];
   const n=specs.length;
   specs.forEach((d,i)=>{
     const f=document.createElement('div');
@@ -784,6 +833,7 @@ const FLOWERS=[
     f.style.left=`clamp(2px, calc(${pct}% - ${d[0]/2}px), calc(100% - ${d[0]}px - 2px))`;
     f.style.animation=`sway ${d[1]}s ease-in-out ${d[2]}s infinite`;
     f.innerHTML=buildFlower(FLOWERS[d[3]]);
+    if(d[3]===2){ f.id='sunflower'; f.classList.add('tappable'); }   // long-press → golden hour
     flowersEl.appendChild(f);
   });
 })();
@@ -982,12 +1032,92 @@ function tick(){
     lastStatusKey=key;
     $('#statusText').textContent = arr[vi];
   }
-  applySky(nightness(now));
-  setCritter(nightness(now)>0.5);
+  if(goldenHour) applyGolden(); else applySky(nightness(now));
+  setCritter(goldenHour ? false : nightness(now)>0.5);
   const lt=$('#localtime');
   if(lt) lt.textContent = now.toLocaleTimeString('en-US',
     {timeZone:'America/Los_Angeles',hour:'numeric',minute:'2-digit',second:'2-digit',timeZoneName:'short'});
 }
+
+/* ===================== EASTER EGGS (undocumented) ===================== */
+const skyGolden=$('#skyGolden');
+/* applied each tick while golden hour is active */
+function applyGolden(){
+  skyGolden.style.opacity=1;
+  skyNight.style.opacity=0;
+  sun.style.opacity=0.95; sun.style.transform='translateY(8px) scale(.9)';   // low warm sun
+  moon.style.opacity=0; stars.style.opacity=0; clouds.style.opacity=0;
+  isNight=false;
+  metaTheme.content='#f0a85e';
+  flowersEl.style.filter='saturate(1.45) brightness(1.04) sepia(.16) hue-rotate(-6deg)'
+    + ' drop-shadow(0 1px 0 rgba(70,35,10,.28)) drop-shadow(0 0 8px rgba(255,150,70,.35))';
+}
+/* (1) GOLDEN HOUR — long-press the sunflower to enter, tap it to exit */
+(function(){
+  const sf=$('#sunflower'); if(!sf) return;
+  let timer=null, fired=false;
+  function enter(){
+    if(goldenHour) return;
+    goldenHour=true;
+    document.body.classList.add('golden');
+    document.body.classList.remove('is-night');
+    if(navigator.vibrate){ try{ navigator.vibrate(18); }catch(e){} }   // bonus haptic; no-op where unsupported
+    applyGolden();
+  }
+  function exit(){
+    if(!goldenHour) return;
+    goldenHour=false;
+    document.body.classList.remove('golden');
+    skyGolden.style.opacity=0;              // fade the golden sky back out
+    const n=nightness(getNow());            // gently rejoin the real time-of-day
+    applySky(n); setCritter(n>0.5);
+  }
+  sf.addEventListener('pointerdown', ()=>{ fired=false; clearTimeout(timer);
+    timer=setTimeout(()=>{ fired=true; enter(); }, 600); });
+  const cancel=()=>clearTimeout(timer);
+  sf.addEventListener('pointerup', ()=>{ clearTimeout(timer); if(!fired && goldenHour) exit(); });
+  sf.addEventListener('pointerleave', cancel);
+  sf.addEventListener('pointercancel', cancel);
+  sf.addEventListener('contextmenu', e=>e.preventDefault());
+})();
+/* (2) SUN / MOON tap — tiny repeatable flourishes, no lasting state */
+(function(){
+  const cel=$('#celestial'); if(!cel) return;
+  cel.addEventListener('click', ()=>{
+    if(isNight){
+      if(!document.querySelector('.aurora')){                           // faint drifting northern lights
+        const au=document.createElement('div'); au.className='aurora';
+        document.body.appendChild(au); setTimeout(()=>au.remove(),4600);
+      }
+      const p=document.createElement('div'); p.className='moon-pulse';   // soft glow ping
+      cel.appendChild(p); setTimeout(()=>p.remove(),1500);
+      [[-28,16],[-12,34],[14,30],[32,-2],[38,24],[6,-16],[-32,-6],[22,46],[-4,-26]].forEach(([dx,dy],i)=>{
+        const s=document.createElement('div'); s.className='twinkle-star';
+        s.style.left=`calc(50% + ${dx}px)`; s.style.top=`calc(50% + ${dy}px)`;
+        s.style.animationDelay=(i*0.08)+'s';
+        cel.appendChild(s); setTimeout(()=>s.remove(),2000);
+      });
+    } else {
+      for(let i=0;i<8;i++){
+        const r=document.createElement('div'); r.className='spark';
+        const a=i*Math.PI/4;
+        r.style.setProperty('--rx',(Math.cos(a)*30).toFixed(1)+'px');
+        r.style.setProperty('--ry',(Math.sin(a)*30).toFixed(1)+'px');
+        cel.appendChild(r); setTimeout(()=>r.remove(),800);
+      }
+    }
+  });
+})();
+/* (3) CONSOLE note for the curious */
+console.log(
+  '%c   ▟▆▙\n   ▜█▛\n    ┃\n'
+  + '%c\nwell, hello. you opened the console — i had a feeling you might.\n\n'
+  + '%cdesigned & built by Adithi Deepak\nhello.adidee@gmail.com   ·   https://adithidesigns.com/',
+  'color:#e5613c;font-family:monospace;font-size:14px;line-height:1.2',
+  'color:#1a1714;font-size:13px',
+  'color:#6e665a;font-family:monospace;font-size:12px'
+);
+
 tick();
 setInterval(tick, 1000);
 
@@ -999,6 +1129,23 @@ function onScroll(){
 window.addEventListener('scroll', onScroll, {passive:true});
 window.addEventListener('resize', updateMorph);
 updateMorph();
+
+/* ---- click "Scroll" → slow, eased glide to the now-playing section ---- */
+function glideTo(targetY, dur){
+  const startY=window.scrollY, dist=targetY-startY, t0=performance.now();
+  const ease=t=> t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;   // gentle ease-in-out
+  (function step(now){
+    const t=Math.min(1,(now-t0)/dur);
+    window.scrollTo(0, startY + dist*ease(t));
+    if(t<1) requestAnimationFrame(step);
+  })(t0);
+}
+const scrollHint=$('#scrollHint');
+if(scrollHint) scrollHint.addEventListener('click', ()=>{
+  const sec=$('#nowplaying'); if(!sec) return;
+  glideTo(sec.getBoundingClientRect().top + window.scrollY - 72, 1200);
+});
+
 </script>
 </body>
 </html>
