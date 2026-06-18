@@ -6,38 +6,38 @@
 <meta name="theme-color" content="#aed1e6">
 <title>Adithi Deepak</title>
 
-<!-- ============================ FONTS (Google Fonts) ============================ -->
+<!-- fonts (google fonts) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Figtree:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
 
 <style>
-/* ============================ TOKENS ============================ */
+/* tokens */
 :root{
-  /* day sky — soft sky blue (a touch more blue, less white) */
+  /* day sky - soft sky blue (a touch more blue, less white) */
   --day-top:    #aed1e6;
   --day-bottom: #d7e8ef;
-  /* night sky — navy */
+  /* night sky - navy */
   --night-top:    #0b1733;
   --night-bottom: #1c2c54;
 
-  --ink:      #1a1714;       /* soft warm near-black (no pure black) */
-  --ink-soft: #4a443b;       /* body text — warm */
-  --ink-tert: #6e665a;       /* tertiary — labels, captions, warm grey */
+  --ink:      #1a1714;
+  --ink-soft: #4a443b;
+  --ink-tert: #6e665a;
   --line:  rgba(26,23,20,.14);
-  --accent: #e5613c;         /* lone warm accent — coral, day value */
+  --accent: #e5613c;
 
-  --ease: cubic-bezier(.22, 1, .36, 1);   /* one calm easing everywhere */
+  --ease: cubic-bezier(.22, 1, .36, 1);
 
-  --app-w: 480px;            /* mobile-only column width cap */
-  --pad:   26px;             /* consistent horizontal padding everywhere */
+  --app-w: 480px;
+  --pad:   26px;
 
-  --pin-h: 92px;             /* height of the pinned top slot region */
+  --pin-h: 92px;
 }
 
-/* ============================ RESET / BASE ============================ */
+/* reset / base */
 *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-/* faint paper-like grain over the whole page — same by day & night, never blocks taps */
+/* faint paper-like grain over the whole page - same by day & night, never blocks taps */
 .grain{
   position:fixed; inset:0; z-index:60; pointer-events:none;
   opacity:.05; mix-blend-mode:soft-light;
@@ -48,7 +48,7 @@ html,body{ height:100%; }
 body{
   font-family:'Figtree',system-ui,sans-serif;
   color:var(--ink);
-  background:#0b1733;                 /* fallback behind the world */
+  background:#0b1733;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
@@ -62,16 +62,14 @@ body{
   min-height:100svh;
 }
 
-/* ====================================================================
-   WORLD LAYER  —  fixed, never scrolls (sky, sun/moon/stars, flowers)
-   ==================================================================== */
+/* world layer - fixed, never scrolls (sky, sun/moon/stars, flowers) */
 .world{
   position:fixed;
   top:0; left:50%; transform:translateX(-50%);
   width:min(100vw,var(--app-w));
   height:100dvh;
   z-index:0;
-  pointer-events:none;            /* never blocks taps */
+  pointer-events:none;
   overflow:hidden;
 }
 
@@ -80,11 +78,17 @@ body{
 .sky-day{   background:linear-gradient(180deg,var(--day-top)   0%, var(--day-bottom)   100%); }
 .sky-night{ background:linear-gradient(180deg,var(--night-top) 0%, var(--night-bottom) 100%);
             opacity:0; transition:opacity 1.6s var(--ease); }
-.sky-golden{ background:linear-gradient(180deg,#e58a4e 0%, #f4b46c 46%, #f7d7a2 100%);
+.sky-golden{ background:linear-gradient(180deg,#d9654f 0%, #e8884f 26%, #f4ab66 56%, #f8d39c 82%, #fbe9c6 100%);
             opacity:0; transition:opacity 1.6s var(--ease); }
 
-/* sun / moon sit top-right */
-.celestial{ position:absolute; top:48px; right:30px; width:74px; height:74px; }
+/* sun / moon sit top-right; they slide in once on load, finishing their orbit */
+.celestial{ position:absolute; top:48px; right:30px; width:74px; height:74px;
+  animation:celestialEnter 2.4s var(--ease) both; }
+@keyframes celestialEnter{
+  0%  { transform:translate(64px,-34px); opacity:0; }
+  35% { opacity:1; }
+  100%{ transform:translate(0,0); opacity:1; }
+}
 /* invisible tap target over the sun/moon, above the content layer */
 .taps{ position:fixed; top:0; left:50%; transform:translateX(-50%);
   width:min(100vw,var(--app-w)); height:100dvh; z-index:7; pointer-events:none; }
@@ -128,7 +132,7 @@ body{
   animation:moonpulse 1.5s var(--ease) forwards; }
 @keyframes moonpulse{ from{ transform:translate(-50%,-50%) scale(.45); opacity:.9; }
   to{ transform:translate(-50%,-50%) scale(3); opacity:0; } }
-/* northern lights — brief, faint, gently drifting (moon tap) */
+/* northern lights - brief, faint, gently drifting (moon tap) */
 .aurora{
   position:fixed; top:0; left:50%; transform:translateX(-50%);
   width:min(100vw,var(--app-w)); height:62%;
@@ -144,7 +148,7 @@ body{
   animation:auroraShow 5.2s var(--ease) forwards, auroraWave 5.2s ease-in-out, auroraSweep 5.2s linear;
 }
 @keyframes auroraShow{ 0%{opacity:0;} 16%{opacity:.9;} 78%{opacity:.7;} 100%{opacity:0;} }
-@keyframes auroraSweep{ from{ background-position-x:0; } to{ background-position-x:-200%; } }   /* curtains travel across */
+@keyframes auroraSweep{ from{ background-position-x:0; } to{ background-position-x:-200%; } }
 @keyframes auroraWave{
   0%  { transform:translateX(-50%) skewX(0deg)  scaleY(1);    }
   28% { transform:translateX(-50%) skewX(-7deg) scaleY(1.09); }
@@ -196,7 +200,7 @@ body{
   transition:filter 1.6s var(--ease);
 }
 .flower{
-  position:absolute; bottom:0;              /* centre placed at even intervals (JS) */
+  position:absolute; bottom:0;
   transform-origin:50% 100%;
   will-change:transform;
 }
@@ -206,19 +210,19 @@ body{
   50%    { transform:rotate(3deg); }
 }
 
-/* critter: butterfly by day / firefly by night — random flight, never clickable */
+/* critter: butterfly by day / firefly by night - random flight, never clickable */
 .critter{
   position:fixed; top:0; left:50%; transform:translateX(-50%);
   width:min(100vw,var(--app-w)); height:100dvh;
-  z-index:6; pointer-events:none;          /* in front of the flowers (z5) */
+  z-index:6; pointer-events:none;
 }
 .bug{ position:absolute; top:0; left:0; will-change:transform; }
 .bug-art{ position:relative; display:flex; align-items:center; }
 .bug-art svg{ display:block; image-rendering:pixelated; shape-rendering:crispEdges; }
-.bug-art .body-art{ position:relative; z-index:1; }   /* body in front of wings */
+.bug-art .body-art{ position:relative; z-index:1; }
 .wing{ will-change:transform;
        animation:flap var(--flap-dur,.32s) ease-in-out infinite alternate; }
-.wing-l{ transform-origin:100% 45%; }                 /* hinge at the body */
+.wing-l{ transform-origin:100% 45%; }
 .wing-r{ transform-origin:0% 45%; }
 @keyframes flap{ from{ transform:scaleX(1); } to{ transform:scaleX(var(--flap-min,.3)); } }
 /* wings settle when the critter lands on a button */
@@ -239,9 +243,7 @@ body{
   50%    { opacity:1;   transform:translate(-50%,-50%) scale(1.1); }
 }
 
-/* ====================================================================
-   PINNED TOP SLOT  —  status line  <->  pixel name (scroll morph)
-   ==================================================================== */
+/* pinned top slot - status line <-> pixel name (scroll morph) */
 .pin{
   position:fixed; top:0; left:50%; transform:translateX(-50%);
   width:min(100vw,var(--app-w));
@@ -292,15 +294,13 @@ body{
   text-shadow:1px 1px 0 rgba(32,36,43,.18);
 }
 
-/* ====================================================================
-   CONTENT LAYER  —  scrolls through the world
-   ==================================================================== */
+/* content layer - scrolls through the world */
 main{ position:relative; z-index:2; }
 
 .reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s var(--ease), transform .7s var(--ease); }
 .reveal.in{ opacity:1; transform:none; }
 
-/* ---- THE FOLD (hero — centred) ---- */
+/* the fold (hero - centred) */
 .fold{
   min-height:100svh;
   display:flex; flex-direction:column; justify-content:center; align-items:center;
@@ -321,12 +321,12 @@ main{ position:relative; z-index:2; }
   font-size:16px; line-height:1.5; color:var(--ink-soft);
   max-width:33ch;
 }
-/* hero links — plain text, no box */
+/* hero links - plain text, no box */
 .links{ margin-top:30px; display:flex; gap:24px; flex-wrap:wrap; justify-content:center; }
 .link{
   pointer-events:auto; display:inline-flex; align-items:center; gap:7px;
   font-family:'Figtree',sans-serif; font-weight:500; font-size:16px;
-  color:var(--accent); text-decoration:none;   /* accent: interactive */
+  color:var(--accent); text-decoration:none;
   transition:color 1.6s var(--ease);
 }
 .link svg{ width:17px; height:17px; }
@@ -344,7 +344,7 @@ main{ position:relative; z-index:2; }
 .scroll-hint .arr{ animation:bob 1.8s ease-in-out infinite; }
 @keyframes bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 
-/* ---- sections below the fold: left-aligned, 80px apart ---- */
+/* sections below the fold: left-aligned, 80px apart */
 .block{ padding:0 var(--pad); margin-top:80px; text-align:left; }
 
 /* the consistent mono-label spine */
@@ -355,7 +355,7 @@ main{ position:relative; z-index:2; }
 }
 .eyebrow{ margin-bottom:12px; }
 
-/* section anchors — company names + the 'between problems' line */
+/* section anchors - company names + the 'between problems' line */
 .h{
   font-family:'Fraunces',serif;
   font-variation-settings:'opsz' 30,'wght' 460;
@@ -365,9 +365,9 @@ main{ position:relative; z-index:2; }
 .sub{ font-family:'Figtree',sans-serif; font-weight:400; color:var(--ink-soft);
       font-size:16px; line-height:1.5; margin-top:8px; max-width:62ch; }
 
-/* ---- NOW PLAYING (vinyl + text, no box) ---- */
+/* now playing (vinyl + text, no box) */
 .song{ display:flex; align-items:center; gap:18px; }
-.vinyl{   /* link wrapper + wobble target (does not spin) */
+.vinyl{
   flex:0 0 auto; position:relative; width:80px; height:80px;
   border:0; padding:0; cursor:pointer; pointer-events:auto; appearance:none; text-decoration:none;
   display:block;
@@ -375,7 +375,7 @@ main{ position:relative; z-index:2; }
 .vinyl.wobble{ animation:vinylwobble .5s var(--ease); }
 @keyframes vinylwobble{ 0%{transform:rotate(0);} 22%{transform:rotate(-9deg);}
   48%{transform:rotate(6deg);} 72%{transform:rotate(-4deg);} 100%{transform:rotate(0);} }
-.disc{   /* the spinning record */
+.disc{
   position:absolute; inset:0; border-radius:50%;
   background:repeating-radial-gradient(circle at 50% 50%, #1b1816 0 1.4px, #2a2622 1.4px 2.8px);
   box-shadow:0 5px 13px rgba(26,23,20,.3), inset 0 0 0 1px rgba(245,240,230,.05);
@@ -390,8 +390,8 @@ main{ position:relative; z-index:2; }
 }
 .album{
   width:38px; height:38px; border-radius:50%; position:relative; z-index:1;
-  background:#caa46a center/cover no-repeat url('album.jpg');   /* album cover */
-  box-shadow:0 0 0 2px var(--accent), inset 0 0 0 1px rgba(26,23,20,.35);  /* accent ring */
+  background:#caa46a center/cover no-repeat url('album.jpg');
+  box-shadow:0 0 0 2px var(--accent), inset 0 0 0 1px rgba(26,23,20,.35);
   display:grid; place-items:center;
   transition:box-shadow 1.6s var(--ease);
 }
@@ -409,10 +409,10 @@ main{ position:relative; z-index:2; }
   color:var(--ink); line-height:1.25; }
 .song-meta .artist{ margin-top:6px; }
 
-/* ---- PROJECTS (two left-aligned items) ---- */
+/* projects (two left-aligned items) */
 .project + .project{ margin-top:30px; }
 
-/* ---- 'BETWEEN PROBLEMS' anchor + plain-text links ---- */
+/* 'between problems' anchor + plain-text links */
 .work{
   font-family:'Fraunces',serif;
   font-variation-settings:'opsz' 30,'wght' 460;
@@ -429,12 +429,12 @@ main{ position:relative; z-index:2; }
 .email-link{
   pointer-events:auto; display:inline-block;
   font-family:'Figtree',sans-serif; font-weight:500; font-size:14px;
-  color:var(--ink); opacity:.58; text-decoration:none;   /* match the muted 'say hi:' colour */
+  color:var(--ink); opacity:.58; text-decoration:none;
   border-bottom:1.5px solid currentColor; padding-bottom:2px;
 }
 .email-link:active{ opacity:.5; }
 
-/* ---- FOOTER QUOTE (left-aligned) ---- */
+/* footer quote (left-aligned) */
 .quote{ margin-top:80px; padding:0 var(--pad); padding-bottom:200px; text-align:left; }
 .quote p{
   font-family:'Fraunces',serif; font-variation-settings:'opsz' 40,'wght' 420;
@@ -452,15 +452,19 @@ main{ position:relative; z-index:2; }
 }
 .localtime{ margin-top:10px; text-align:center; }
 
-/* ====================================================================
-   NIGHT TEXT TREATMENT  (added on <body> via JS when it's mostly night)
-   ==================================================================== */
+/* night text treatment (added on <body> via js when it's mostly night) */
 body.is-night{ --ink:#f1eadd; --ink-soft:#cfc7b8; --ink-tert:#a59c8c; --line:rgba(241,234,221,.16);
   --accent:#ff7a4d;          /* a few shades brighter so coral stays vivid on navy */ }
-/* golden hour easter egg — warm low light, accent glows a touch stronger */
+/* golden hour easter egg - warm low light, accent glows a touch stronger */
 body.golden{ --ink:#2a201a; --ink-soft:#5a4a3a; --ink-tert:#7a6650; --accent:#ff6a33; }
 body.golden .link{ text-shadow:0 0 10px rgba(255,106,51,.45); }
 body.golden .album{ box-shadow:0 0 0 2px var(--accent), 0 0 12px rgba(255,106,51,.5), inset 0 0 0 1px rgba(26,23,20,.3); }
+/* the sun glows warmly and steadily through golden hour */
+body.golden .sun{ animation:sunGlow 3.4s ease-in-out infinite; }
+@keyframes sunGlow{
+  0%,100%{ filter:drop-shadow(0 0 20px rgba(255,192,102,1)) drop-shadow(0 0 44px rgba(255,158,76,.85)) drop-shadow(0 0 70px rgba(255,142,62,.55)); }
+  50%    { filter:drop-shadow(0 0 32px rgba(255,214,124,1)) drop-shadow(0 0 64px rgba(255,172,88,.95)) drop-shadow(0 0 104px rgba(255,150,68,.7)); }
+}
 body.is-night .pin::before{ background:linear-gradient(180deg,var(--night-bottom) 38%, transparent 100%); }
 body{ transition:color 1.6s var(--ease); }
 </style>
@@ -469,7 +473,7 @@ body{ transition:color 1.6s var(--ease); }
 <body>
 <div class="app">
 
-  <!-- ===== WORLD LAYER (fixed) ===== -->
+  <!-- world layer (fixed) -->
   <div class="world" aria-hidden="true">
     <div class="sky sky-day"></div>
     <div class="sky sky-night"></div>
@@ -486,20 +490,20 @@ body{ transition:color 1.6s var(--ease); }
 
   </div>
 
-  <!-- ===== FLOWERS (front layer, content scrolls behind) ===== -->
+  <!-- flowers (front layer, content scrolls behind) -->
   <div class="flowers" id="flowers" aria-hidden="true"></div>
 
-  <!-- ===== CRITTER (butterfly by day / firefly by night) ===== -->
+  <!-- critter (butterfly by day / firefly by night) -->
   <div class="critter" id="critter" aria-hidden="true">
     <div class="bug" id="bug"><div class="glow"></div><div class="bug-art" id="bugArt"></div></div>
   </div>
 
-  <!-- ===== sun/moon tap target (sits above content so it's reachable) ===== -->
+  <!-- sun/moon tap target (sits above content so it's reachable) -->
   <div class="taps" aria-hidden="true">
     <button class="celestial-tap" id="celestialTap" type="button" aria-label="sky"></button>
   </div>
 
-  <!-- ===== PINNED TOP SLOT ===== -->
+  <!-- pinned top slot -->
   <div class="pin" id="pin">
     <div class="pin-stack">
       <span class="pin-status" id="status"><span class="dot"></span><span id="statusText">…</span></span>
@@ -507,13 +511,13 @@ body{ transition:color 1.6s var(--ease); }
     </div>
   </div>
 
-  <!-- ===== CONTENT LAYER ===== -->
+  <!-- content layer -->
   <main>
 
     <!-- THE FOLD -->
     <section class="fold">
       <h1 class="name" id="foldName">Adithi Deepak</h1>
-      <p class="intro">I'm a product and UX designer who turns complex problems into something simple and considered, made to work for the people on the other side of the screen. Outside that, you'll find me on the move, out in nature, or trying a new food spot.</p>
+      <p class="intro">I'm a Product &amp; UX designer. I synthesize designs to distill complex problems into simple, actionable, human patterns. When I'm not building, I'm on the move, exploring new places, out in nature or treating my taste buds.</p>
       <div class="links">
         <a class="link" href="https://www.linkedin.com/in/adithid/" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
@@ -576,10 +580,6 @@ body{ transition:color 1.6s var(--ease); }
 <div class="grain" aria-hidden="true"></div>
 
 <script>
-/* =====================================================================
-   ADITHI · NFC card — first pass
-   Vanilla, static, client-side only.
-   ===================================================================== */
 const $ = (s,r=document)=>r.querySelector(s);
 const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -587,21 +587,17 @@ const metaTheme=document.querySelector('meta[name="theme-color"]');
 const _hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const lerpHex=(a,b,t)=>'#'+_hx(a).map((v,i)=>Math.round(v+(_hx(b)[i]-v)*t).toString(16).padStart(2,'0')).join('');
 
-/* ---------------------------------------------------------------------
-   TIME  (visitor's device clock)
-   --------------------------------------------------------------------- */
+/* time (visitor's device clock) */
 function getNow(){ return new Date(); }
 
-/* ---------------------------------------------------------------------
-   STATUS  (config windows → working → touching grass)
-   --------------------------------------------------------------------- */
-// EDIT CONFIG WINDOWS HERE — local datetimes. Month is 0-indexed (June = 5).
+/* status (config windows → working → touching grass) */
+// EDIT CONFIG WINDOWS HERE - local datetimes. Month is 0-indexed (June = 5).
 const CONFIG_WINDOWS = [
-  [new Date(2026,5,24, 8,0), new Date(2026,5,24,17,0)], // Wed 24 Jun 08:00–17:00
-  [new Date(2026,5,24,18,0), new Date(2026,5,24,21,0)], // Wed 24 Jun 18:00–21:00
-  [new Date(2026,5,25, 8,0), new Date(2026,5,25,17,0)], // Thu 25 Jun 08:00–17:00
-  [new Date(2026,5,25,18,0), new Date(2026,5,25,21,0)], // Thu 25 Jun 18:00–21:00
-  [new Date(2026,5,26, 8,0), new Date(2026,5,26,13,0)], // Fri 26 Jun 08:00–13:00
+  [new Date(2026,5,24, 8,0), new Date(2026,5,24,17,0)],
+  [new Date(2026,5,24,18,0), new Date(2026,5,24,21,0)],
+  [new Date(2026,5,25, 8,0), new Date(2026,5,25,17,0)],
+  [new Date(2026,5,25,18,0), new Date(2026,5,25,21,0)],
+  [new Date(2026,5,26, 8,0), new Date(2026,5,26,13,0)],
 ];
 const VARIANTS = {
   config:  ["Currently @ config", "Still @ config", "Come say hi @ config"],
@@ -638,11 +634,11 @@ const VARIANTS = {
 function statusState(now){
   for(const [s,e] of CONFIG_WINDOWS){ if(now>=s && now<e) return 'config'; }
   const h=now.getHours();
-  if(h>=9 && h<17)  return 'work';      // 9am–5pm
-  if(h>=17 && h<22) return 'evening';   // 5pm–10pm
-  return 'night';                        // 10pm–9am
+  if(h>=9 && h<17)  return 'work';
+  if(h>=17 && h<22) return 'evening';
+  return 'night';
 }
-function variantIndex(now){ return Math.floor(now.getTime()/12000); } // rotate ~12s (mod by list length in tick)
+function variantIndex(now){ return Math.floor(now.getTime()/12000); }
 
 /* ---------------------------------------------------------------------
    DAY / NIGHT  (smooth, eased at boundaries; day 6am–7pm)
@@ -650,24 +646,24 @@ function variantIndex(now){ return Math.floor(now.getTime()/12000); } // rotate 
    --------------------------------------------------------------------- */
 function nightness(now){
   const m = now.getHours()*60 + now.getMinutes();
-  if(m < 360)  return 1;                 // before 06:00
-  if(m < 420)  return 1-(m-360)/60;      // 06:00–07:00 dawn
-  if(m < 1080) return 0;                 // 07:00–18:00 day
-  if(m < 1140) return (m-1080)/60;       // 18:00–19:00 dusk
-  return 1;                              // after 19:00
+  if(m < 360)  return 1;
+  if(m < 420)  return 1-(m-360)/60;
+  if(m < 1080) return 0;
+  if(m < 1140) return (m-1080)/60;
+  return 1;
 }
 
 const skyNight = $('.sky-night'), sun=$('.sun'), moon=$('.moon'),
       stars=$('#stars'), clouds=$('#clouds'), flowersEl=$('#flowers');
 
-/* ---- round pixel discs for the sun & moon ---- */
+/* round pixel discs for the sun & moon */
 function disc(N, r, base, light, edge){
   const c=(N-1)/2, cells=[];
   for(let y=0;y<N;y++) for(let x=0;x<N;x++){
     const dx=x-c, dy=y-c, d=Math.hypot(dx,dy);
-    if(d > r+0.4) continue;                              // outside the circle
-    let col = d > r-1 ? edge : base;                     // darker rim = roundness
-    if(Math.hypot(x-(c-r*0.34), y-(c-r*0.34)) < r*0.46) col=light;   // top-left highlight
+    if(d > r+0.4) continue;
+    let col = d > r-1 ? edge : base;
+    if(Math.hypot(x-(c-r*0.34), y-(c-r*0.34)) < r*0.46) col=light;
     cells.push({x,y,col});
   }
   return {c,cells};
@@ -698,17 +694,17 @@ function discSVG(N, cells, extra=''){
 let isNight=false, goldenHour=false;
 function applySky(n){
   skyNight.style.opacity = n;
-  sun.style.opacity  = 1-n;
+  sun.style.opacity  = clamp(1 - n*2);
   sun.style.transform = `translateY(${n*-10}px) scale(${1-0.1*n})`;
-  moon.style.opacity = n;
+  moon.style.opacity = clamp(n*2 - 1);
   moon.style.transform = `translateY(${(1-n)*10}px) scale(${0.9+0.1*n})`;
   stars.style.opacity = n;
-  clouds.style.opacity = 1-n;        // clouds out by day
+  clouds.style.opacity = 1-n;
   isNight = n>0.5;
   document.body.classList.toggle('is-night', isNight);
-  metaTheme.content = lerpHex('#aed1e6','#0b1733', n);   // Safari bars blend with the sky
+  metaTheme.content = lerpHex('#aed1e6','#0b1733', n);
   // flowers lit to match the time of day: neutral midday, golden at dawn/dusk, cool & dim at night
-  const warm = 4*n*(1-n);                       // golden-hour warmth — peaks at the sunrise/sunset transitions
+  const warm = 4*n*(1-n);
   const bright = lerp(1.0,0.72,n) - warm*0.04;
   const sat    = lerp(1.18,0.85,n) + warm*0.12;
   const sep    = warm*0.22;
@@ -721,9 +717,7 @@ function applySky(n){
     + ` drop-shadow(0 0 ${coolGlow}px rgba(150,180,255,${0.45*n}))`;
 }
 
-/* ---------------------------------------------------------------------
-   STARS  (build once)
-   --------------------------------------------------------------------- */
+/* stars (build once) */
 (function buildStars(){
   const sparkleSVG=c=>`<svg viewBox="0 0 7 7" width="100%" height="100%"><g fill="${c}">`
     +`<rect x="2" y="2" width="3" height="3"/><rect x="3" y="0" width="1" height="7"/>`
@@ -770,13 +764,11 @@ function applySky(n){
   })();
 })();
 
-/* ---------------------------------------------------------------------
-   FLOWERS  (pixel SVG, gentle sway)
-   --------------------------------------------------------------------- */
+/* flowers (pixel svg, gentle sway) */
 /* Each pixel flower is authored as a small ASCII grid; letters map to a
    palette so every bloom carries light (L) + base (P) + shadow (D) shades,
    a distinct centre, and a shaded green stem with leaves. Light source = top-left. */
-const W=15, CX=7;                 // shared canvas width + stem column
+const W=15, CX=7;
 function pixelArt(rows, pal){
   const w=Math.max(...rows.map(r=>r.length));
   let body='';
@@ -789,7 +781,7 @@ function pixelArt(rows, pal){
   return `<svg viewBox="0 0 ${w} ${rows.length}" width="100%" height="100%" `
        + `preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges">${body}</svg>`;
 }
-function centerPad(rows){               // centre a blossom grid on the W canvas
+function centerPad(rows){
   const bw=Math.max(...rows.map(r=>r.length));
   const left=Math.floor((W-bw)/2);
   return rows.map(r=>'.'.repeat(left)+r+'.'.repeat(W-left-r.length));
@@ -809,16 +801,16 @@ function rampAt(ramp, t){
 function buildFlower(def){
   const g=GREENS[def.green];
   let Wc, c, headRows, grid;
-  if(def.spike){                                    // vertical floret spike (lavender)
+  if(def.spike){
     const hmax=def.spikeR; Wc=2*hmax+1; c=hmax; headRows=def.spikeH;
     grid=Array.from({length:headRows+def.stemH},()=>Array(Wc).fill(null));
     for(let y=0;y<headRows;y++){
-      let half=Math.min(hmax, Math.round(y*0.62)); if(y%2) half=Math.max(0,half-1);   // bumpy florets
+      let half=Math.min(hmax, Math.round(y*0.62)); if(y%2) half=Math.max(0,half-1);
       const ty=y/(headRows-1);
       for(let dx=-half;dx<=half;dx++){ const x=c+dx, edge=Math.abs(dx)/Math.max(1,hmax);
         grid[y][x]=rampAt(def.ramp, clamp(0.16+0.5*edge+0.2*ty)); }
     }
-  } else {                                          // radial circular flower
+  } else {
     const N=def.petals, R=def.R, Rc=def.Rc, fill=def.fill!=null?def.fill:0.4, off=N*Math.PI/2;
     Wc=2*R+1; c=R; headRows=Wc;
     grid=Array.from({length:headRows+def.stemH},()=>Array(Wc).fill(null));
@@ -833,7 +825,7 @@ function buildFlower(def){
     }
   }
   const H=grid.length;
-  for(let y=headRows;y<H;y++) grid[y][c]=g.S;        // 1px stem
+  for(let y=headRows;y<H;y++) grid[y][c]=g.S;
   (def.leaves||[]).forEach(lf=>{
     const r=headRows+lf.at; if(r+1>=H) return;
     if(lf.side==='L'){ grid[r][c-1]=g.E; grid[r][c-2]=g.E; grid[r-1][c-2]=g.E; if(c-3>=0)grid[r-1][c-3]=g.E; grid[r+1][c-1]=g.e; }
@@ -846,48 +838,48 @@ function buildFlower(def){
        + `preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges">${body}</svg>`;
 }
 
-// circular wildflowers — N distinct petals around a centre disc (cramp), petals from ramp
+// circular wildflowers - N distinct petals around a centre disc (cramp), petals from ramp
 const YEL=['#ffe9a0','#f2c84a','#cf9f2e'], BRN=['#9a6e3e','#6b4a28','#33210f'],
       DRK=['#5a4450','#2c1f28','#160e12'], DBL=['#48608f','#2c3f6b','#192448'],
       PALEB=['#eef4ff','#cdddf7','#a9c2ee'], PALEP=['#efe6ff','#d3c2f2','#b49ae6'];
 const FLOWERS=[
-  { /* red poppy — broad petals, dark centre */
+  {
     ramp:['#fb9a8d','#f47163','#ec4f41','#e23b2e','#cc3326','#ac291d','#8c1f15'], cramp:DRK,
     petals:6, R:7, Rc:2, fill:.55, green:0, stemH:17, leaves:[{at:7,side:'L'},{at:11,side:'R'}] },
-  { /* periwinkle — five rounded petals */
+  {
     ramp:['#b8cef5','#94b0ec','#6f93e2','#5072cf','#3f5cbb','#3450a8','#2a4496'], cramp:PALEB,
     petals:5, R:6, Rc:1, fill:.5, green:1, stemH:13, leaves:[{at:8,side:'R'},{at:10,side:'L'}] },
-  { /* sunflower — many yellow petals, big brown disc */
+  {
     ramp:['#fff3b0','#ffe785','#ffd954','#f9c534','#eab026','#d2991f','#b87f18'], cramp:BRN,
     petals:18, R:8, Rc:4, fill:.34, green:2, stemH:15, leaves:[{at:8,side:'L'},{at:12,side:'R'}] },
-  { /* lavender-violet — rounded petals */
+  {
     ramp:['#dccaf7','#c4abef','#a888e2','#8a64cf','#7350bb','#5f43a3','#4e388c'], cramp:PALEP,
     petals:6, R:6, Rc:1, fill:.5, green:0, stemH:11, leaves:[{at:7,side:'R'},{at:9,side:'L'}] },
-  { /* pink cosmos — eight petals, yellow centre */
+  {
     ramp:['#fde0eb','#f9c0d6','#f29bbb','#ea6fa6','#d6588f','#bd4576','#a23a64'], cramp:YEL,
     petals:8, R:7, Rc:2, fill:.42, green:1, stemH:17, leaves:[{at:9,side:'L'},{at:13,side:'R'}] },
-  { /* purple aster — many thin petals */
+  {
     ramp:['#e0d3f7','#cbb4f0','#aa8be4','#8a5fd0','#7550bf','#6243a6','#523a8f'], cramp:YEL,
     petals:16, R:7, Rc:2, fill:.3, green:2, stemH:15, leaves:[{at:9,side:'R'},{at:13,side:'L'}] },
-  { /* white daisy — many petals, yellow centre */
+  {
     ramp:['#fbf8f1','#f4efe5','#e9e2d4','#dcd4c4','#cbc2b0','#b8af9c','#a59c88'], cramp:YEL,
     petals:13, R:7, Rc:2, fill:.3, green:1, stemH:13, leaves:[{at:7,side:'L'},{at:11,side:'R'}] },
-  { /* yellow buttercup — five petals */
+  {
     ramp:['#fff3b8','#ffe785','#ffd95a','#f9c63e','#e8aa2c','#cf8f22','#b67a1b'], cramp:['#fff0a8','#e8c84a','#b07d22'],
     petals:5, R:6, Rc:1, fill:.52, green:2, stemH:12, leaves:[{at:7,side:'R'},{at:9,side:'L'}] },
-  { /* blue cornflower — frilly, many petals */
+  {
     ramp:['#bcd2f7','#97b6ef','#6f97e6','#4f7fe0','#3e67c6','#3354aa','#294791'], cramp:DBL,
     petals:13, R:7, Rc:2, fill:.32, green:0, stemH:16, leaves:[{at:8,side:'L'},{at:12,side:'R'}] },
-  { /* lavender — purple floret spike */
+  {
     spike:true, ramp:['#e3d6f5','#cbb8ee','#ad93e2','#8f6fd1','#7757bb','#6244a0','#4f3787'],
     spikeR:3, spikeH:14, green:2, stemH:11, leaves:[{at:4,side:'L'},{at:7,side:'R'}] },
-  { /* soft pink wild rose — five broad petals */
+  {
     ramp:['#ffe2ec','#fcc6d8','#f7a3bf','#f48fb0','#e6749a','#d25c82','#b94a6e'], cramp:YEL,
     petals:5, R:7, Rc:3, fill:.58, green:2, stemH:14, leaves:[{at:7,side:'L'},{at:11,side:'R'}] },
 ];
 
 (function buildFlowers(){
-  // [widthPx, durationS, delayS, flowerIndex] — flex spaces them evenly
+  // [widthPx, durationS, delayS, flowerIndex] - flex spaces them evenly
   // widths ≈ real-life relative bloom sizes: sunflower biggest … violet smallest
   const specs=[[46,4.6,-0.3,10],[38,5.4,-1.1,1],[62,4.0,-0.6,2],[34,5.8,-2.0,3],[50,4.4,-1.4,4],
                [44,5.0,-0.9,5],[44,4.2,-1.7,6],[38,4.8,-1.2,7],[44,5.2,-0.5,8],[26,4.5,-1.5,9],
@@ -897,32 +889,30 @@ const FLOWERS=[
     const f=document.createElement('div');
     f.className='flower';
     f.style.width=d[0]+'px';
-    const pct = n===1 ? 50 : 6 + i*(88/(n-1));   // centres evenly across the width
+    const pct = n===1 ? 50 : 6 + i*(88/(n-1));
     // clamp so the end flowers never spill past the column edges
     f.style.left=`clamp(2px, calc(${pct}% - ${d[0]/2}px), calc(100% - ${d[0]}px - 2px))`;
     f.style.animation=`sway ${d[1]}s ease-in-out ${d[2]}s infinite`;
     f.innerHTML=buildFlower(FLOWERS[d[3]]);
-    if(d[3]===2){ f.id='sunflower'; f.classList.add('tappable'); }   // long-press → golden hour
+    if(d[3]===2){ f.id='sunflower'; f.classList.add('tappable'); }
     flowersEl.appendChild(f);
   });
 })();
 
-/* ---------------------------------------------------------------------
-   CLOUDS  (random count of shaded pixel clouds, drifting left→right; day)
-   --------------------------------------------------------------------- */
-const CLOUD_PAL={H:'#eef1f6',W:'#dde4ee',M:'#c8d2e1',S:'#b3c0d4'};  // cool soft greys read on the warm sky
+/* clouds (random count of shaded pixel clouds, drifting left→right; day) */
+const CLOUD_PAL={H:'#eef1f6',W:'#dde4ee',M:'#c8d2e1',S:'#b3c0d4'};
 function makeCloud(){
   const W=30,H=10, g=Array.from({length:H},()=>Array(W).fill('.'));
-  const baseY=H-3, n=5+Math.floor(Math.random()*3);     // 5–7 puffs (broader clouds)
+  const baseY=H-3, n=5+Math.floor(Math.random()*3);
   for(let i=0;i<n;i++){
     const cx=2+Math.random()*(W-4), r=2+Math.random()*2.2, cy=baseY-r*0.6;
     for(let y=0;y<H;y++)for(let x=0;x<W;x++) if(Math.hypot(x-cx,y-cy)<=r) g[y][x]='W';
   }
-  for(let x=0;x<W;x++){ let top=-1;                       // flat-ish base
+  for(let x=0;x<W;x++){ let top=-1;
     for(let y=0;y<H;y++) if(g[y][x]==='W'){ top=y; break; }
     if(top>=0) for(let y=top;y<=baseY;y++) g[y][x]='W';
   }
-  for(let x=0;x<W;x++){ const ys=[];                      // shade top→bottom
+  for(let x=0;x<W;x++){ const ys=[];
     for(let y=0;y<H;y++) if(g[y][x]!=='.') ys.push(y);
     if(!ys.length) continue;
     const t=ys[0], b=ys[ys.length-1];
@@ -932,26 +922,24 @@ function makeCloud(){
 }
 (function buildClouds(){
   const layer=$('#clouds'), layerW=layer.clientWidth||320;
-  const count=2+Math.floor(Math.random()*4);             // random 2–5 clouds
+  const count=2+Math.floor(Math.random()*4);
   for(let i=0;i<count;i++){
     const wpx=78+Math.random()*88;
     const el=document.createElement('div');
     el.className='cloud';
     el.style.width=wpx+'px';
-    el.style.top=(3+Math.random()*32)+'%';               // upper sky
+    el.style.top=(3+Math.random()*32)+'%';
     el.innerHTML=pixelArt(makeCloud(),CLOUD_PAL);
-    const dur=40+Math.random()*42;                        // slow, varied drift
+    const dur=40+Math.random()*42;
     el.style.animationDuration=dur+'s';
-    el.style.animationDelay=(-Math.random()*dur)+'s';     // spread out at load
+    el.style.animationDelay=(-Math.random()*dur)+'s';
     el.style.setProperty('--x0', (-(wpx+50))+'px');
     el.style.setProperty('--x1', (layerW+50)+'px');
     layer.appendChild(el);
   }
 })();
 
-/* ---------------------------------------------------------------------
-   CRITTER  (pixel butterfly by day, firefly by night; random drift)
-   --------------------------------------------------------------------- */
+/* critter (pixel butterfly by day, firefly by night; random drift) */
 // firefly = flapping wings + body (built from pieces, mirrored)
 const CRITTERS={
   firefly:{
@@ -962,11 +950,11 @@ const CRITTERS={
     wing:{ pal:{l:'#6a6253',W:'#37322a'},
            rows:["lW.","lWW","lWW",".lW","..l"] } },
 };
-// monarch — author the LEFT half (centre column is the last char), mirror for symmetry
+// monarch - author the LEFT half (centre column is the last char), mirror for symmetry
 const mirrorRows = half => half.map(r=>{ const b=r.slice(0,-1);
   return b + r[r.length-1] + [...b].reverse().join(''); });
 const BFLY={ w:58,
-  // orange forewings, gold hindwings (Y) — warmer, truer monarch; off-white dots
+  // orange forewings, gold hindwings (Y) - warmer, truer monarch; off-white dots
   pal:{K:'#1b1b1b',O:'#e9701c',Y:'#f4a62b',w:'#f2ecdf'},
   half:["........w......","........K......",".........K.....","..........K....",
         "..KKKKKKKKKKKKK",".KKwOOOOOOOOKKK","KKwOOOOOOOOOKKK","KwOOOOOOOOOOKKK",
@@ -1002,7 +990,7 @@ function restSpots(){
   const lr=critterLayer.getBoundingClientRect(), h=critterLayer.clientHeight;
   return [...document.querySelectorAll('.link,.portfolio')]
     .map(b=>b.getBoundingClientRect())
-    .filter(r=> r.width>0 && r.top>54 && r.bottom<h-12)            // currently on screen
+    .filter(r=> r.width>0 && r.top>54 && r.bottom<h-12)
     .map(r=>({ x:r.left-lr.left+r.width*(0.3+Math.random()*0.4), y:r.top+r.height*0.5-6 }));
 }
 function step(t){
@@ -1018,7 +1006,7 @@ function step(t){
     const s=Math.min(spd, d/8);
     bx+=Math.cos(ang)*s*dt*60; by+=Math.sin(ang)*s*dt*60;
     if(d<4){ mode='resting'; restUntil=t+1600+Math.random()*3200; bug.classList.add('resting'); }
-  } else {                                   // wander: drifting turn rate = looping paths
+  } else {
     turn += (Math.random()-0.5)*9*dt;
     turn = Math.max(-3.2, Math.min(3.2, turn));
     ang += turn*dt;
@@ -1042,9 +1030,7 @@ setCritter(nightness(getNow())>0.5);
 bx=critterLayer.clientWidth*0.5; by=critterLayer.clientHeight*0.4;
 requestAnimationFrame(step);
 
-/* ---------------------------------------------------------------------
-   PIN MORPH  (status line  <->  pixel name, tied to scroll, reversible)
-   --------------------------------------------------------------------- */
+/* pin morph (status line <-> pixel name, tied to scroll, reversible) */
 const NAME='Adithi Deepak';
 const pinName=$('#pinName'), statusEl=$('#status'), foldName=$('#foldName'), pin=$('#pin');
 const seeds=[];
@@ -1063,14 +1049,14 @@ const pchars=[...pinName.querySelectorAll('.pchar')];
 
 function updateMorph(){
   const r=foldName.getBoundingClientRect();
-  const thr=70, range=64;                 // morph as the real name passes the slot
-  const p=clamp((thr - r.bottom)/range);  // 0 = name visible, 1 = name gone
+  const thr=70, range=64;
+  const p=clamp((thr - r.bottom)/range);
   // status melts out
   statusEl.style.opacity = 1-p;
   statusEl.style.transform = `translateY(${-6*p}px) scale(${1-0.06*p})`;
   // pixel name assembles in
   pinName.style.opacity = p;
-  const e = p*p*(3-2*p);                  // smoothstep
+  const e = p*p*(3-2*p);
   pchars.forEach((c,i)=>{
     const [dx,dy]=seeds[i];
     c.style.transform = `translate(${dx*(1-e)}px, ${dy*(1-e)}px)`;
@@ -1079,17 +1065,13 @@ function updateMorph(){
   pin.classList.toggle('lifted', p>0.02);
 }
 
-/* ---------------------------------------------------------------------
-   REVEAL ON SCROLL
-   --------------------------------------------------------------------- */
+/* reveal on scroll */
 const io=new IntersectionObserver((entries)=>{
   entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
 },{ threshold:0.18 });
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-/* ---------------------------------------------------------------------
-   TICK  (status text + sky)  &  scroll loop
-   --------------------------------------------------------------------- */
+/* tick (status text + sky) & scroll loop */
 let lastStatusKey='';
 function tick(){
   const now=getNow();
@@ -1108,20 +1090,21 @@ function tick(){
     {timeZone:'America/Los_Angeles',hour:'numeric',minute:'2-digit',second:'2-digit',timeZoneName:'short'});
 }
 
-/* ===================== EASTER EGGS (undocumented) ===================== */
+/* easter eggs (undocumented) */
 const skyGolden=$('#skyGolden');
 /* applied each tick while golden hour is active */
 function applyGolden(){
   skyGolden.style.opacity=1;
   skyNight.style.opacity=0;
-  sun.style.opacity=0.95; sun.style.transform='translateY(8px) scale(.9)';   // low warm sun
+  sun.style.opacity=1; sun.style.transform='translateY(12px) scale(1.04)';
   moon.style.opacity=0; stars.style.opacity=0; clouds.style.opacity=0;
   isNight=false;
   metaTheme.content='#f0a85e';
-  flowersEl.style.filter='saturate(1.45) brightness(1.04) sepia(.16) hue-rotate(-6deg)'
-    + ' drop-shadow(0 1px 0 rgba(70,35,10,.28)) drop-shadow(0 0 8px rgba(255,150,70,.35))';
+  // warm golden light catching the flowers (richer + a soft reflective glow)
+  flowersEl.style.filter='saturate(1.55) brightness(1.1) sepia(.22) hue-rotate(-8deg)'
+    + ' drop-shadow(0 -2px 1px rgba(255,205,120,.4)) drop-shadow(0 0 12px rgba(255,168,80,.55))';
 }
-/* (1) GOLDEN HOUR — long-press the sunflower to enter, tap it to exit */
+/* (1) GOLDEN HOUR - long-press the sunflower to enter, tap it to exit */
 (function(){
   const sf=$('#sunflower'); if(!sf) return;
   let timer=null, fired=false;
@@ -1130,15 +1113,15 @@ function applyGolden(){
     goldenHour=true;
     document.body.classList.add('golden');
     document.body.classList.remove('is-night');
-    if(navigator.vibrate){ try{ navigator.vibrate(18); }catch(e){} }   // bonus haptic; no-op where unsupported
+    if(navigator.vibrate){ try{ navigator.vibrate(18); }catch(e){} }
     applyGolden();
   }
   function exit(){
     if(!goldenHour) return;
     goldenHour=false;
     document.body.classList.remove('golden');
-    skyGolden.style.opacity=0;              // fade the golden sky back out
-    const n=nightness(getNow());            // gently rejoin the real time-of-day
+    skyGolden.style.opacity=0;
+    const n=nightness(getNow());
     applySky(n); setCritter(n>0.5);
   }
   sf.addEventListener('pointerdown', ()=>{ fired=false; clearTimeout(timer);
@@ -1154,12 +1137,12 @@ function flyBirds(){
   // side-profile bird (facing the flight direction) with a flapping wing
   const art='<svg viewBox="0 0 22 16" width="22" height="16">'
     + '<g fill="#3a342c">'
-    +   '<ellipse cx="9" cy="9" rx="6" ry="2.3"/>'        // body
-    +   '<circle cx="14.6" cy="8" r="1.9"/>'              // head
-    +   '<path d="M16 7.4 L19.4 8 L16 8.8 Z"/>'           // beak
-    +   '<path d="M3.4 9 L0 7.2 L0 10.8 Z"/>'             // tail
+    +   '<ellipse cx="9" cy="9" rx="6" ry="2.3"/>'
+    +   '<circle cx="14.6" cy="8" r="1.9"/>'
+    +   '<path d="M16 7.4 L19.4 8 L16 8.8 Z"/>'
+    +   '<path d="M3.4 9 L0 7.2 L0 10.8 Z"/>'
     + '</g>'
-    + '<path class="wing" fill="#2f2a23" d="M9 8 L13 1.5 L5.5 4 Z"/>'   // flapping wing
+    + '<path class="wing" fill="#2f2a23" d="M9 8 L13 1.5 L5.5 4 Z"/>'
     + '</svg>';
   const flock=3+Math.floor(Math.random()*2);
   for(let i=0;i<flock;i++){
@@ -1169,21 +1152,21 @@ function flyBirds(){
     b.style.animation=`birdfly ${dur.toFixed(2)}s linear ${(i*0.45).toFixed(2)}s forwards`;
     b.innerHTML=art;
     const wing=b.querySelector('.wing');
-    if(wing) wing.style.animationDuration=(0.22+Math.random()*0.1).toFixed(2)+'s';   // slightly varied flap
+    if(wing) wing.style.animationDuration=(0.22+Math.random()*0.1).toFixed(2)+'s';
     document.body.appendChild(b);
     setTimeout(()=>b.remove(), (dur+i*0.45+0.4)*1000);
   }
 }
-/* (2) SUN / MOON tap — tiny repeatable flourishes, no lasting state */
+/* (2) SUN / MOON tap - tiny repeatable flourishes, no lasting state */
 (function(){
   const cel=$('#celestial'), tap=$('#celestialTap'); if(!cel||!tap) return;
   tap.addEventListener('click', ()=>{
     if(isNight){
-      if(!document.querySelector('.aurora')){                           // faint drifting northern lights
+      if(!document.querySelector('.aurora')){
         const au=document.createElement('div'); au.className='aurora';
         document.body.appendChild(au); setTimeout(()=>au.remove(),5400);
       }
-      const p=document.createElement('div'); p.className='moon-pulse';   // soft glow ping
+      const p=document.createElement('div'); p.className='moon-pulse';
       cel.appendChild(p); setTimeout(()=>p.remove(),1500);
       [[-28,16],[-12,34],[14,30],[32,-2],[38,24],[6,-16],[-32,-6],[22,46],[-4,-26]].forEach(([dx,dy],i)=>{
         const s=document.createElement('div'); s.className='twinkle-star';
@@ -1192,7 +1175,7 @@ function flyBirds(){
         cel.appendChild(s); setTimeout(()=>s.remove(),2000);
       });
     } else {
-      const p=document.createElement('div'); p.className='sun-pulse';   // warm halo, holds ~10s
+      const p=document.createElement('div'); p.className='sun-pulse';
       cel.appendChild(p); setTimeout(()=>p.remove(),10200);
       flyBirds();
     }
@@ -1220,10 +1203,10 @@ window.addEventListener('scroll', onScroll, {passive:true});
 window.addEventListener('resize', updateMorph);
 updateMorph();
 
-/* ---- click "Scroll" → slow, eased glide to the now-playing section ---- */
+/* click "scroll" → slow, eased glide to the now-playing section */
 function glideTo(targetY, dur){
   const startY=window.scrollY, dist=targetY-startY, t0=performance.now();
-  const ease=t=> t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;   // gentle ease-in-out
+  const ease=t=> t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
   (function step(now){
     const t=Math.min(1,(now-t0)/dur);
     window.scrollTo(0, startY + dist*ease(t));
